@@ -1,0 +1,73 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Заказ оформлен{% endblock %}
+
+{% block content %}
+    <h2>Заказ успешно оформлен!</h2>
+    <p>Спасибо за ваш заказ на сумму {{ total_price }}!</p>
+    <p>В ближайшее время с вами свяжется наш менеджер для уточнения деталей.</p>
+    <a href="/">Вернуться на главную страницу</a>
+{% endblock %}
+
+{% extends 'main/base.html' %}
+
+{% block title %}Оформление заказа{% endblock %}
+
+{% block content %}
+    <h2>Оформление заказа</h2>
+
+    {% if cart_items %}
+        <ul>
+            {% for item in cart_items %}
+                <li>
+                    <h3>{{ item.service.title }}</h3>
+                    <p>Количество: {{ item.quantity }}</p>
+                    <p>Цена за единицу: {{ item.service.price }}</p>
+                    <p>Итоговая цена: {{ item.total_price }}</p>
+                </li>
+            {% endfor %}
+        </ul>
+
+        <h3>Итоговая стоимость заказа: {{ total_price }}</h3>
+
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit">Подтвердить заказ</button>
+        </form>
+
+        <a href="{% url 'view_cart' %}">Вернуться в корзину</a>
+    {% else %}
+        <p>Ваша корзина пуста. Нечего оформлять.</p>
+        <a href="/">Продолжить покупки</a>
+    {% endif %}
+{% endblock %}
+
+{% extends 'main/base.html' %}
+
+{% block title %}Редактировать услугу "{{ service.title }}"{% endblock %}
+
+{% block content %}
+    <h2>Редактировать услугу "{{ service.title }}"</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Сохранить изменения</button>
+    </form>
+{% endblock %}
+
+{% extends 'main/base.html' %}
+
+{% block title %}Добавить услугу{% endblock %}
+
+{% block content %}
+    <h2>Добавить услугу</h2>
+    <form method="post" enctype="multipart/form-data"> 
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Добавить услугу</button>
+    </form>
+{% endblock %}
+
+{% extends 'main/base.html' %}
+
+{% block title %}Заказ оформлен{% endblock %}

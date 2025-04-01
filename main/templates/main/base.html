@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Интернет-магазин{% endblock %}</title>
+</head>
+<body>
+    <nav>
+        <a href="/">Главная</a>
+        <a href="{% url 'view_cart' %}">Корзина</a>  {% comment %} Ссылка на корзину {% endcomment %}
+        {% if user.is_authenticated %}
+            <div style="display: inline-block;">
+                <a href="{% url 'profile' %}" style="display: inline-block; vertical-align: middle;">
+                    {% if user.pfp %}
+                        <img src="{{ user.pfp.url }}" alt="Фото профиля" style="width: 30px; height: 30px; border-radius: 50%; vertical-align: middle; margin-right: 5px;">
+                    {% else %}
+                        <span style="display: inline-block; width: 30px; height: 30px; border-radius: 50%; background-color: #ccc; text-align: center; line-height: 30px; vertical-align: middle; margin-right: 5px;">👤</span>
+                    {% endif %}
+                    {{ user.username }}
+                </a>
+                <a href="{% url 'logout' %}" style="display: inline-block; vertical-align: middle; margin-left: 10px;">Выход</a>
+            </div>
+            {% if user.isTrusted %}
+                <a href="{% url 'add_service' %}">Добавить услугу</a>
+            {% endif %}
+        {% else %}
+            <a href="{% url 'register' %}">Регистрация</a>
+            <a href="{% url 'login' %}">Вход</a>
+        {% endif %}
+    </nav>
+
+    {% block content %}
+    {% endblock %}
+
+</body>
+</html>

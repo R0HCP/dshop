@@ -1,0 +1,15 @@
+# Created by venv; see https://docs.python.org/3/library/venv.html
+
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.sqlite3
+__pycache__/
+pfp/
+.env
+.idea/
+*.pyc
+
+dshop_new_env/ 
+db.sqlite3 

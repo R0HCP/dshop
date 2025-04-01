@@ -1,0 +1,32 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Оформление заказа{% endblock %}
+
+{% block content %}
+    <h2>Оформление заказа</h2>
+
+    {% if cart_items %}
+        <ul>
+            {% for item in cart_items %}
+                <li>
+                    <h3>{{ item.service.title }}</h3>
+                    <p>Количество: {{ item.quantity }}</p>
+                    <p>Цена за единицу: {{ item.service.price }}</p>
+                    <p>Итоговая цена: {{ item.total_price }}</p>
+                </li>
+            {% endfor %}
+        </ul>
+
+        <h3>Итоговая стоимость заказа: {{ total_price }}</h3>
+
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit">Подтвердить заказ</button>
+        </form>
+
+        <a href="{% url 'view_cart' %}">Вернуться в корзину</a>
+    {% else %}
+        <p>Ваша корзина пуста. Нечего оформлять.</p>
+        <a href="/">Продолжить покупки</a>
+    {% endif %}
+{% endblock %}

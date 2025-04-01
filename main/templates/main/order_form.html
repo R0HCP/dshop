@@ -1,0 +1,13 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Заказ услуги "{{ service.title }}"{% endblock %}
+
+{% block content %}
+    <h2>Заказ услуги "{{ service.title }}"</h2>
+    <p>Цена за единицу: {{ service.price }}</p>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Заказать</button>
+    </form>
+{% endblock %}

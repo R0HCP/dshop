@@ -1,0 +1,35 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Корзина{% endblock %}
+
+{% block content %}
+    <h2>Корзина</h2>
+
+    {% if cart_items %}
+        <ul>
+            {% for item in cart_items %}
+                <li>
+                    <h3>{{ item.service.title }}</h3>
+                    <p>Цена за единицу: {{ item.service.price }}</p>
+                    <form method="post" action="{% url 'update_cart_quantity' item.service.id %}">
+                        {% csrf_token %}
+                        <label for="quantity_{{ item.service.id }}">Количество:</label>
+                        <input type="number" id="quantity_{{ item.service.id }}" name="quantity" value="{{ item.quantity }}" min="1">
+                        <button type="submit">Обновить</button>
+                    </form>
+                    <p>Итоговая цена: {{ item.total_price }}</p>
+                    <a href="{% url 'remove_from_cart' item.service.id %}">Удалить из корзины</a>
+                </li>
+            {% endfor %}
+        </ul>
+
+        <h3>Итоговая стоимость корзины: {{ total_price }}</h3>
+
+        <a href="{% url 'clear_cart' %}">Очистить корзину</a>
+        <a href="/">Продолжить покупки</a>
+        <a href="{% url 'checkout' %}">Оформить заказ</a> 
+    {% else %}
+        <p>Ваша корзина пуста.</p>
+        <a href="/">Продолжить покупки</a>
+    {% endif %}
+{% endblock %}

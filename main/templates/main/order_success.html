@@ -1,0 +1,28 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Заказ успешно оформлен{% endblock %}
+
+{% block content %}
+    <h2>Заказ успешно оформлен!</h2>
+    <p>Номер вашего заказа: {{ order_id }}</p>
+    <p>Спасибо за ваш заказ!</p>
+
+    {% if completion_date %}
+        <p>Ориентировочная дата выполнения заказа: <strong>{{ completion_date }}</strong></p>
+    {% endif %}
+
+    <h3>Контактная информация продавца:</h3>
+    {% if seller %}
+        <p>Имя пользователя: {{ seller.username }}</p>
+        {% if seller.email %}
+            <p>Email: <a href="mailto:{{ seller.email }}">{{ seller.email }}</a></p>
+        {% endif %}
+        {% if seller.phone %}
+            <p>Телефон: {{ seller.phone }}</p>
+        {% endif %}
+    {% else %}
+        <p>Информация о продавце недоступна.</p>
+    {% endif %}
+
+    <a href="/">Вернуться на главную страницу</a>
+{% endblock %}

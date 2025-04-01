@@ -1,0 +1,42 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Главная страница{% endblock %}
+
+{% block content %}
+    <h1>Список услуг</h1>
+
+    <form method="get" action="/">
+        <input type="text" name="search" placeholder="Поиск услуг" value="{{ request.GET.search }}" oninput="this.form.submit()">
+    </form>
+
+    <form method="get" action="/">
+        <label for="sort">Сортировать по:</label>
+        <select name="sort" id="sort" onchange="this.form.submit()">
+            <option value="">По умолчанию</option>
+            <option value="price_asc" {% if request.GET.sort == 'price_asc' %}selected{% endif %}>Цена (по возрастанию)</option>
+            <option value="price_desc" {% if request.GET.sort == 'price_desc' %}selected{% endif %}>Цена (по убыванию)</option>
+            <option value="title_asc" {% if request.GET.sort == 'title_asc' %}selected{% endif %}>Название (А-Я)</option>
+            <option value="title_desc" {% if request.GET.sort == 'title_desc' %}selected{% endif %}>Название (Я-А)</option>
+        </select>
+    </form>
+
+    <ul>
+        {% for service in services %}
+        <li>
+            <a href="{% url 'service_detail' service.id %}">
+                {% if service.images %}
+                    <img src="{{ service.images.url }}" alt="{{ service.title }}" style="max-width: 100px;">
+                {% endif %}
+                <h3>{{ service.title }}</h3>
+                <p>Цена: {{ service.price }}</p>
+            </a>
+            <form method="post" action="{% url 'add_to_cart' service.id %}">
+                {% csrf_token %}
+                <button type="submit">В корзину</button>
+            </form>
+        </li>
+        {% empty %}
+            <li>Нет доступных услуг.</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

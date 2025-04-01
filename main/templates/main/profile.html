@@ -1,0 +1,27 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Личный кабинет{% endblock %}
+
+{% block content %}
+    <h2>Личный кабинет</h2>
+    <p>Добро пожаловать, {{ user.username }}!</p>
+
+    <h3>Редактировать профиль</h3>
+    <form method="post" enctype="multipart/form-data"> {% comment %} enctype="multipart/form-data" для загрузки файлов {% endcomment %}
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Сохранить изменения</button>
+    </form>
+
+    {% if request.user.is_staff or request.user.is_superuser %} {% comment %} Покажем кнопку только для админов/суперюзеров (пример) {% endcomment %}
+        <h3>Изменить статус доверия пользователя (пример - для админов)</h3>
+        <form method="post" action="{% url 'toggle_trusted' %}">
+            {% csrf_token %}
+            <input type="hidden" name="user_id" value="{{ user.id }}"> {% comment %} Передаем ID текущего пользователя для примера {% endcomment %}
+            <button type="submit">{% if user.isTrusted %}Снять доверие{% else %}Сделать доверенным{% endif %}</button>
+        </form>
+        <p><strong>Внимание:</strong> Кнопка изменения статуса доверия пользователя в этом примере показана в личном кабинете для демонстрации. В реальном приложении управление статусом доверия лучше реализовать в админ-панели или в специальном разделе для администраторов, чтобы избежать случайного изменения пользователями своего статуса.</p>
+    {% endif %}
+
+    <a href="/">Вернуться на главную страницу</a>
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Редактировать услугу "{{ service.title }}"{% endblock %}
+
+{% block content %}
+    <h2>Редактировать услугу "{{ service.title }}"</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Сохранить изменения</button>
+    </form>
+{% endblock %}
