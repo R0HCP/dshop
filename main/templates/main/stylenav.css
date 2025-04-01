@@ -1,0 +1,146 @@
+/* Основные стили для навбара */
+.navbar {
+    background-color: #2c3e50 !important; /* Тёмно-синий фон */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 12px 20px;
+}
+
+.navbar-brand {
+    font-weight: 700;
+    color: #ecf0f1 !important;
+    font-size: 22px;
+    transition: color 0.3s;
+}
+
+.navbar-brand:hover {
+    color: #3498db !important;
+}
+
+/* Стили для пунктов меню */
+.navbar-nav .nav-item {
+    margin: 0 5px;
+}
+
+.navbar-nav .nav-link {
+    color: #ecf0f1 !important;
+    font-weight: 500;
+    padding: 8px 15px;
+    border-radius: 4px;
+    transition: all 0.3s;
+}
+
+.navbar-nav .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #3498db !important;
+}
+
+.navbar-nav .active .nav-link {
+    background-color: #3498db;
+    color: white !important;
+}
+
+/* Стиль для профиля пользователя */
+.nav-item img, .nav-item span {
+    width: 35px !important;
+    height: 35px !important;
+    border: 2px solid #3498db;
+    transition: transform 0.3s;
+}
+
+.nav-item img:hover, .nav-item span:hover {
+    transform: scale(1.1);
+}
+
+/* Стили для выпадающего меню */
+.dropdown-menu {
+    background-color: #34495e;
+    border: none;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    padding: 10px 0;
+    margin-top: 10px;
+    border-radius: 5px;
+}
+
+.dropdown-item {
+    color: #ecf0f1;
+    padding: 8px 20px;
+    transition: all 0.2s;
+}
+
+.dropdown-item:hover {
+    background-color: #3498db;
+    color: white;
+}
+
+.dropdown-divider {
+    border-top: 1px solid rgba(236, 240, 241, 0.1);
+    margin: 8px 0;
+}
+
+/* Стиль для кнопки toggler на мобильных устройствах */
+.navbar-toggler {
+    border: none;
+    background-color: rgba(236, 240, 241, 0.1);
+    padding: 8px;
+}
+
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(236, 240, 241, 1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+/* Стили для поисковой формы */
+.form-inline .form-control {
+    background-color: rgba(236, 240, 241, 0.1);
+    border: none;
+    color: #ecf0f1;
+    border-radius: 20px 0 0 20px;
+    padding: 10px 15px;
+    width: 200px;
+}
+
+.form-inline .form-control::placeholder {
+    color: rgba(236, 240, 241, 0.6);
+}
+
+.form-inline .form-control:focus {
+    background-color: rgba(236, 240, 241, 0.2);
+    box-shadow: none;
+}
+
+.form-inline .btn {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 0 20px 20px 0;
+    padding: 10px 20px;
+    transition: background-color 0.3s;
+}
+
+.form-inline .btn:hover {
+    background-color: #2980b9;
+}
+
+/* Стиль для disabled ссылки */
+.nav-link.disabled {
+    color: rgba(236, 240, 241, 0.4) !important;
+}
+
+/* Адаптивность для мобильных устройств */
+@media (max-width: 992px) {
+    .navbar-collapse {
+        background-color: #2c3e50;
+        padding: 15px;
+        border-radius: 5px;
+        margin-top: 10px;
+    }
+    
+    .form-inline {
+        margin-top: 15px;
+    }
+    
+    .form-inline .form-control, .form-inline .btn {
+        width: 100%;
+        border-radius: 20px;
+        margin: 5px 0;
+    }
+}
