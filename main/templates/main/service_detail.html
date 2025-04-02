@@ -3,7 +3,7 @@
 {% block title %}{{ service.title }}{% endblock %}
 
 {% block content %}
-    <h1>{{ service.title }}</h1>
+    <h2>{{ service.title }}</h2>
     {% if service.images %}
         <img src="{{ service.images.url }}" alt="{{ service.title }}" style="max-width: 300px;">
     {% endif %}
