@@ -22,14 +22,14 @@
     color: #000 !important;
     background-color: #3498db;
     border-radius: 4px;
-    padding: 0px 8px;
-    margin: 8px 0   ;
+    padding: 0px 8px; /*может это и не костыль*/
+    margin: 4px 0;
     transform: translateX(-8px);
 }
 
 /* Стили для пунктов меню */
 .navbar-nav .nav-item {
-    margin: 0 5px;
+    margin: 0 8px;
 }
 
 .navbar-nav .nav-link {
@@ -154,4 +154,25 @@
         border-radius: 20px;
         margin: 5px 0;
     }
+}
+
+
+.search-form {
+    position: relative;
+}
+
+.search-form::before {
+    content: "";
+    background-image: url("search_24dp_F3F3F3.svg");
+    background-repeat: no-repeat;
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    transform: translateY(-50%);
+    width: 24px;
+    height: 24px;
+}
+
+.search-form input {
+    padding-left: 30px;
 }
