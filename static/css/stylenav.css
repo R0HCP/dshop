@@ -9,9 +9,6 @@
 
 .navbar-brand {
     font-family: 'PT Serif', serif;
-}
-
-.navbar-brand {
     font-weight: 700;
     color: #ecf0f1 !important;
     font-size: 22px;
@@ -34,16 +31,21 @@
 
 .navbar-nav .nav-link {
     color: #ecf0f1 !important;
-    font-weight: 500;
+    font-weight: 400;
     padding: 8px 15px;
     border-radius: 4px;
-    transition: all 0.3s;
+    transition: font-weight 0.6s ease; /* Изменено: transition для font-weight */
+    font-family: "Inter", sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal; /* Убрали дублирование font-weight */
 }
 
 .navbar-nav .nav-link:hover {
     background-color: rgba(255, 255, 255, 0.1);
     color: #3498db !important;
-}
+    font-weight: 900; /* Увеличиваем font-weight при наведении */
+    /* transition: transform 0.6s; Убрали, т.к. transition уже в .nav-link */
+}   
 
 .navbar-nav .active .nav-link {
     background-color: #3498db;
@@ -176,3 +178,4 @@
 .search-form input {
     padding-left: 30px;
 }
+

@@ -5,9 +5,9 @@
 {% block content %}
     <h2>Заказ услуги "{{ service.title }}"</h2>
     <p>Цена за единицу: {{ service.price }}</p>
-    <form method="post">
+    <form method="post" class="some-form">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit">Заказать</button>
+        <button type="submit" class="major-button">Заказать</button>
     </form>
 {% endblock %}

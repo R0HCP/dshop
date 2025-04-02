@@ -1,0 +1,161 @@
+h2{
+    font-family: 'PT Serif', serif;
+    font-weight: 700;
+    color: #222 !important;
+    font-size: 22px;
+    display: flex;
+    margin-top: 12px;
+    justify-content: center;
+}
+
+.major-button {
+    color: #222 !important;
+    font-weight: 400;
+    padding: 8px 15px;
+    border-radius: 12px;
+    border: none;
+    transition: background-color 0.6s ease, border-radius 0.6s ease, color 0.6s ease, font-weight 0.6s ease; /* Добавили transition для background-color, border-radius и color */
+    font-family: "Inter", sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+    background-color: #2980b9;
+    display: block; /* Чтобы кнопка занимала всю ширину контейнера, если нужно */
+    margin-top: 20px; /* Отступ сверху */
+    width: 100%; /* Занимает всю ширину контейнера */
+    box-sizing: border-box; /* Чтобы padding не увеличивал общую ширину */
+    cursor: pointer;
+
+}
+
+.major-button:hover {
+    background-color: #000;
+    color: #3498db !important;
+    border-radius: 4px;
+    font-weight: 900;
+}
+
+/* Общие стили формы */
+.some-form {
+    max-width: 600px; /* Ограничиваем максимальную ширину формы */
+    margin: 20px auto; /* Центрируем форму на странице и добавляем отступы */
+    padding: 30px;
+    background-color: #f9f9f9; /* Светлый фон */
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Легкая тень для выделения формы */
+    font-family: 'Inter', sans-serif; /* Современный шрифт */
+}
+
+textarea {
+    height: 28px;
+}
+.some-form h2 {
+    text-align: center;
+    margin-bottom: 25px;
+    color: #333;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block; /* Метка на новой строке над полем */
+    margin-bottom: 8px;
+    color: #555;
+    font-weight: 600; /* Полужирная метка */
+}
+
+/* Стили для текстовых полей и textarea */
+.form-control {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    box-sizing: border-box; /* Чтобы padding не увеличивал общую ширину */
+    transition: border-color 0.3s ease; /* Плавное изменение цвета рамки при фокусе */
+}
+
+.form-control:focus {
+    border-color: #3498db; /* Цвет рамки при фокусе */
+    outline: none; /* Убираем стандартную обводку фокуса браузера */
+    box-shadow: 0 0 5px rgba(52, 152, 219, 0.5); /* Легкая тень при фокусе */
+}
+
+.form-control[type="number"] {
+    -moz-appearance: textfield; /* Firefox */
+}
+
+.form-control[type="number"]::-webkit-outer-spin-button,
+.form-control[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none; /* Chrome, Safari, Edge */
+    margin: 0;
+}
+
+.form-control textarea {
+    resize: vertical; /* Разрешить вертикальное изменение размера textarea */
+    min-height: 150px; /* Минимальная высота для textarea */
+}
+
+/* Стили для файлового ввода */
+.form-group-file {
+    margin-bottom: 20px;
+}
+
+.form-group-file label {
+    display: block;
+    margin-bottom: 8px;
+    color: #555;
+    font-weight: 600;
+}
+
+.file-input-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.file-input-button {
+    background-color: #eee; /* Светло-серый фон для кнопки "Browse..." */
+    color: #333;
+    padding: 10px 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-block; /* Чтобы выровнять с "No file selected." */
+}
+
+.file-input-button:hover {
+    background-color: #ddd;
+}
+
+.file-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    opacity: 0; /* Скрываем стандартный input file */
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+}
+
+.file-selected-text {
+    display: inline-block;
+    margin-left: 10px;
+    color: #777;
+}
+
+
+
+
+/* Адаптивность (необязательно, но полезно) */
+@media (max-width: 768px) {
+    .add-service-form {
+        padding: 20px; /* Уменьшаем отступы на маленьких экранах */
+        margin: 10px;
+    }
+    .form-control, .submit-button {
+        font-size: 14px; /* Уменьшаем размер шрифта на маленьких экранах */
+    }
+}

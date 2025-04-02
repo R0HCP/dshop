@@ -4,10 +4,10 @@
 
 {% block content %}
     <h2>Вход</h2>
-    <form method="post">
+    <form method="post" class="some-form">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit">Войти</button>
+        <button type="submit" class="major-button">Войти</button>
     </form>
     <p>Нет аккаунта? <a href="{% url 'register' %}">Зарегистрироваться</a></p>
 {% endblock %}

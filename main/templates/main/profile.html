@@ -7,10 +7,10 @@
     <p>Добро пожаловать, {{ user.username }}!</p>
 
     <h3>Редактировать профиль</h3>
-    <form method="post" enctype="multipart/form-data"> {% comment %} enctype="multipart/form-data" для загрузки файлов {% endcomment %}
+    <form method="post" enctype="multipart/form-data" class="some-form"> {% comment %} enctype="multipart/form-data" для загрузки файлов {% endcomment %}
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit">Сохранить изменения</button>
+        <button type="submit" class="major-button">Сохранить изменения</button>
     </form>
 
     {% if request.user.is_staff or request.user.is_superuser %} {% comment %} Покажем кнопку только для админов/суперюзеров (пример) {% endcomment %}
