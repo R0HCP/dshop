@@ -6,7 +6,8 @@
     <h1>Список услуг</h1>
 
     <form method="get" action="/">
-        <input type="text" name="search" placeholder="Поиск услуг" value="{{ request.GET.search }}" oninput="this.form.submit()">
+        <input type="text" name="search" id="search" value="{{ request.GET.search }}" placeholder="Введите текст для поиска">
+        <button type="submit">Найти</button>
     </form>
 
     <form method="get" action="/">
