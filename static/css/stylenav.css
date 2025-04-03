@@ -1,28 +1,43 @@
+/* stylenav.css */
+/* Использует переменные, определенные в theme.css */
+
 /* Основные стили для навбара */
 .navbar {
-    background-color: #2c3e50 !important; /* Тёмно-синий фон */
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    background-color: var(--bg-navbar) !important; /* Фон навбара */
+    box-shadow: 0 2px 10px var(--shadow-navbar); /* Тень навбара */
     padding: 12px 20px;
     font-family: 'Bitter', serif;
     font-size: 16px;
+    /*transition: background-color 0.3s ease, box-shadow 0.3s ease;  Плавные переходы */
 }
 
 .navbar-brand {
     font-family: 'Bitter', serif;
     font-weight: 550;
-    color: #ecf0f1 !important;
+    color: var(--text-navbar) !important; /* Цвет текста бренда */
     font-size: 22px;
-    transition: color 0.3s;
+    /* Объединяем переходы из оригинала + добавляем для темы */
+     transition: color 0.3s; /* ease, background-color 0.3s ease, padding 0.3s ease, transform 0.3s ease; */
 }
 
 .navbar-brand:hover {
-    color: #000 !important;
-    background-color: #3498db;
+    color: var(--text-navbar-brand-hover) !important; /* Цвет текста бренда при наведении */
+    background-color: var(--bg-navbar-brand-hover); /* Фон бренда при наведении */
     border-radius: 4px;
-    padding: 0px 8px; /*может это и не костыль*/
+    padding: 0px 8px;
     margin: 4px 0;
     transform: translateX(-8px);
 }
+
+
+
+
+
+
+
+
+
+
 
 /* Стили для пунктов меню */
 .navbar-nav .nav-item {
@@ -30,34 +45,42 @@
 }
 
 .navbar-nav .nav-link {
-    color: #ecf0f1 !important;
+    color: var(--text-navbar) !important; /* Цвет текста ссылок */
     font-weight: 400;
     padding: 8px 15px;
     border-radius: 4px;
-    transition: font-weight 0.45s ease; /* Изменено: transition для font-weight */
+    /* Объединяем переходы из оригинала + добавляем для темы */
+    transition: font-weight 0.45s ease, background-color 0.3s ease, color 0.3s ease;
     font-family: "Inter", sans-serif;
     font-optical-sizing: auto;
-    font-style: normal; /* Убрали дублирование font-weight */
+    font-style: normal;
 }
 
 .navbar-nav .nav-link:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-    color: #3498db !important;
+    background-color: var(--bg-navbar-link-hover); /* Фон ссылки при наведении */
+    color: var(--text-navbar-link-hover) !important; /* Цвет ссылки при наведении */
     font-weight: 750; /* Увеличиваем font-weight при наведении */
-    /* transition: transform 0.6s; Убрали, т.к. transition уже в .nav-link */
-}   
-
-.navbar-nav .active .nav-link {
-    background-color: #3498db;
-    color: white !important;
 }
 
-/* Стиль для профиля пользователя */
-.nav-item img, .nav-item span {
+/* Стиль для активной ссылки */
+.navbar-nav .active .nav-link {
+    background-color: var(--bg-navbar-link-active); /* Фон активной ссылки */
+    color: var(--text-navbar-active) !important; /* Цвет текста активной ссылки */
+}
+
+/* Стиль для профиля пользователя (иконка/инициалы) */
+.nav-item img, .nav-item span { /* Предполагаем, что span используется для инициалов */
     width: 35px !important;
     height: 35px !important;
-    border: 2px solid #3498db;
-    transition: transform 0.3s;
+    border: 2px solid var(--border-profile); /* Цвет рамки профиля */
+    transition: transform 0.3s, border-color 0.3s ease; /* Добавляем переход для рамки */
+    /* Дополнительно для span, если он используется */
+    display: inline-flex; /* Чтобы центрировать текст внутри */
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%; /* Делаем круглым */
+    background-color: var(--bg-secondary); /* Фоновый цвет для инициалов */
+    color: var(--text-primary); /* Цвет текста инициалов */
 }
 
 .nav-item img:hover, .nav-item span:hover {
@@ -66,116 +89,149 @@
 
 /* Стили для выпадающего меню */
 .dropdown-menu {
-    background-color: #34495e;
-    border: none;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    background-color: var(--bg-dropdown); /* Фон выпадающего меню */
+    border: none; /* Или используйте var(--border-color) если нужна рамка */
+    box-shadow: var(--shadow-dropdown); /* Тень выпадающего меню */
     padding: 10px 0;
-    margin-top: 10px;
+    margin-top: 10px; /* Можно оставить или сделать переменной */
     border-radius: 5px;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Плавные переходы */
 }
 
 .dropdown-item {
-    color: #ecf0f1;
+    color: var(--text-dropdown); /* Цвет текста пунктов */
     padding: 8px 20px;
-    transition: all 0.2s;
+    transition: all 0.2s ease; /* all включает background-color и color */
 }
 
 .dropdown-item:hover {
-    background-color: #3498db;
-    color: white;
+    background-color: var(--bg-dropdown-item-hover); /* Фон пункта при наведении */
+    color: var(--text-dropdown-hover); /* Цвет текста пункта при наведении */
 }
 
+/* Разделитель в выпадающем меню */
 .dropdown-divider {
-    border-top: 1px solid rgba(236, 240, 241, 0.1);
+    border-top: 1px solid var(--border-divider); /* Цвет разделителя */
     margin: 8px 0;
+    transition: border-color 0.3s ease; /* Плавный переход */
 }
 
 /* Стиль для кнопки toggler на мобильных устройствах */
 .navbar-toggler {
-    border: none;
-    background-color: rgba(236, 240, 241, 0.1);
+    border: var(--border-toggler); /* Граница кнопки */
+    background-color: var(--bg-toggler); /* Фон кнопки */
     padding: 8px;
+    transition: background-color 0.3s ease, border-color 0.3s ease; /* Плавные переходы */
+}
+
+.navbar-toggler:focus {
+    outline: none;
+    box-shadow: 0 0 0 0.2rem var(--border-color-focus); /* Добавляем тень при фокусе, как у Bootstrap */
 }
 
 .navbar-toggler-icon {
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(236, 240, 241, 1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+    background-image: var(--icon-toggler); /* Иконка гамбургера */
+    /* transition не нужен, т.к. меняется сама картинка */
 }
 
-/* Стили для поисковой формы */
-.form-inline .form-control {
-    background-color: rgba(236, 240, 241, 0.1);
+/* Стили для поисковой формы в навбаре */
+/* Примечание: оригинальные стили были для .form-inline, но в Bootstrap 5 это .d-flex */
+/* Будем использовать более общие селекторы внутри .navbar */
+.navbar .form-control { /* Стили для поля ввода поиска в навбаре */
+    background-color: var(--bg-input-navbar); /* Фон поля */
+    border: none; /* Убираем стандартную рамку */
+    color: var(--text-input-navbar); /* Цвет текста */
+    border-radius: 20px; /* Применяем ко всему полю */
+    padding: 10px 15px 10px 35px; /* Добавляем отступ слева для иконки */
+    /* width: 200px; /* Ширину лучше контролировать через Bootstrap классы или контейнер */
+    transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease; /* Плавные переходы */
+}
+
+.navbar .form-control::placeholder {
+    color: var(--text-input-navbar-placeholder); /* Цвет плейсхолдера */
+    opacity: 1; /* Убедимся, что он виден */
+}
+
+.navbar .form-control:focus {
+    background-color: var(--bg-input-navbar-focus); /* Фон при фокусе */
+    box-shadow: none; /* Убираем стандартную тень фокуса */
+    /* Можно добавить свою тень фокуса, если нужно */
+    /* box-shadow: 0 0 5px var(--border-color-focus); */
+}
+
+/* Контейнер для формы поиска для позиционирования иконки */
+.navbar .search-form {
+    position: relative;
+}
+
+/* Иконка поиска перед полем ввода */
+.navbar .search-form::before {
+    content: "";
+    background-image: var(--icon-search); /* Иконка поиска */
+    background-repeat: no-repeat;
+    background-position: center center; /* Центрируем иконку */
+    position: absolute;
+    top: 50%;
+    left: 12px; /* Отступ иконки слева */
+    transform: translateY(-50%);
+    width: 20px; /* Размер иконки */
+    height: 20px;
+    opacity: 0.7; /* Немного прозрачности */
+    pointer-events: none; /* Чтобы не мешала клику по полю */
+    transition: opacity 0.3s ease; /* Плавный переход для иконки, если нужно */
+}
+
+/* Кнопка поиска (если она есть рядом с полем) */
+/* Предположим, у нее есть класс .btn-search или используется стандартный .btn */
+.navbar .btn-search { /* Или просто .navbar .btn, если она одна */
+    background-color: var(--bg-button-search); /* Фон кнопки */
+    color: var(--text-button-search); /* Цвет текста кнопки */
     border: none;
-    color: #ecf0f1;
-    border-radius: 20px 0 0 20px;
-    padding: 10px 15px;
-    width: 200px;
-}
-
-.form-inline .form-control::placeholder {
-    color: rgba(236, 240, 241, 0.6);
-}
-
-.form-inline .form-control:focus {
-    background-color: rgba(236, 240, 241, 0.2);
-    box-shadow: none;
-}
-
-.form-inline .btn {
-    background-color: #3498db;
-    color: white;
-    border: none;
-    border-radius: 0 20px 20px 0;
+    border-radius: 20px; /* Скругляем */
     padding: 10px 20px;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.form-inline .btn:hover {
-    background-color: #2980b9;
+.navbar .btn-search:hover {
+    background-color: var(--bg-button-search-hover); /* Фон при наведении */
 }
 
 /* Стиль для disabled ссылки */
 .nav-link.disabled {
-    color: rgba(236, 240, 241, 0.4) !important;
+    color: var(--text-disabled) !important; /* Цвет неактивной ссылки */
+    /* Можно добавить другие стили, например, убрать pointer-events */
+    /* pointer-events: none; */
 }
 
 /* Адаптивность для мобильных устройств */
 @media (max-width: 992px) {
     .navbar-collapse {
-        background-color: #2c3e50;
+        background-color: var(--bg-navbar); /* Фон меню на мобильных */
         padding: 15px;
         border-radius: 5px;
         margin-top: 10px;
+        box-shadow: var(--shadow-dropdown); /* Добавим тень, как у выпадашки */
+        transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Плавный переход */
     }
-    
-    .form-inline {
+
+    /* Делаем форму поиска и кнопку под ней на всю ширину */
+    .navbar .search-form {
         margin-top: 15px;
-    }
-    
-    .form-inline .form-control, .form-inline .btn {
         width: 100%;
-        border-radius: 20px;
+    }
+
+    .navbar .form-control, /* Поле поиска */
+    .navbar .btn-search { /* Кнопка поиска */
+        width: 100%;
+        border-radius: 20px; /* Одинаковое скругление */
         margin: 5px 0;
     }
+
+     /* Убираем иконку из before для поля на мобильных, если нужно */
+    .navbar .search-form::before {
+       /* display: none; */ /* Раскомментировать, если иконка мешает */
+    }
+    .navbar .form-control {
+         /* padding-left: 15px; */ /* Восстановить отступ, если иконка убрана */
+    }
 }
-
-
-.search-form {
-    position: relative;
-}
-
-.search-form::before {
-    content: "";
-    background-image: url("search_24dp_F3F3F3.svg");
-    background-repeat: no-repeat;
-    position: absolute;
-    top: 50%;
-    left: 10px;
-    transform: translateY(-50%);
-    width: 24px;
-    height: 24px;
-}
-
-.search-form input {
-    padding-left: 30px;
-}
-

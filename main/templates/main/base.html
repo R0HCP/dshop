@@ -6,6 +6,7 @@
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     {% load static %}
+    <link rel="stylesheet" href="{% static 'css/theme.css' %}">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -47,6 +48,10 @@
         {% endif %}
     </nav> -->
 
+
+    {% load static %}
+    <script src="{% static 'js/theme-switcher.js' %}"></script>
+
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <a class="navbar-brand" href="/">Магазин маркетинга</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -62,6 +67,11 @@
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <a class="dropdown-item" href="#">Action</a>
                         <a class="dropdown-item" href="#">Another action</a>
+                        <button class="theme-toggle-button dropdown-item" id="theme-toggle" title="Переключить тему" aria-label="Переключить тему" aria-live="polite">
+                            <span class="icon icon-sun" aria-hidden="true">☀️</span> <!-- Иконка солнца (скрыта по умолчанию) -->
+                            <span class="icon icon-moon" aria-hidden="true">🌙</span> <!-- Иконка луны (видна по умолчанию) -->
+                            <span class="toggle-text">Светлая тема</span> <!-- Текст будет меняться JS -->
+                        </button>
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="#">Something else here</a>
                     </div>

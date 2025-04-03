@@ -3,10 +3,22 @@
 {% block title %}Личный кабинет{% endblock %}
 
 {% block content %}
-    <h2>Личный кабинет</h2>
-    <p>Добро пожаловать, {{ user.username }}!</p>
+    {% now "G" as current_hour_str %} {# Получаем час как строку #}
+    {% with current_hour=current_hour_str|add:0 %} {# Преобразуем в число #}
+        <h2>
+            {% if 5 <= current_hour and current_hour < 12 %}
+                Доброе утро
+            {% elif 12 <= current_hour and current_hour < 17 %}
+                Добрый день
+            {% elif 17 <= current_hour and current_hour < 22 %}
+                Добрый вечер
+            {% else %}
+                Доброй ночи
+            {% endif %}
+            , {{ user.username }}!
+        </h2>
+    {% endwith %}
 
-    <h3>Редактировать профиль</h3>
     <form method="post" enctype="multipart/form-data" class="some-form"> {% comment %} enctype="multipart/form-data" для загрузки файлов {% endcomment %}
         {% csrf_token %}
         {{ form.as_p }}
@@ -14,7 +26,7 @@
     </form>
 
     {% if request.user.is_staff or request.user.is_superuser %} {% comment %} Покажем кнопку только для админов/суперюзеров (пример) {% endcomment %}
-        <h3>Изменить статус доверия пользователя (пример - для админов)</h3>
+        <h2>Изменить статус доверия пользователя (пример - для админов)</h2>
         <form method="post" action="{% url 'toggle_trusted' %}">
             {% csrf_token %}
             <input type="hidden" name="user_id" value="{{ user.id }}"> {% comment %} Передаем ID текущего пользователя для примера {% endcomment %}

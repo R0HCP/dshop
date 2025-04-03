@@ -1,0 +1,564 @@
+
+:root {
+    /* === Светлая тема (По умолчанию) === */
+  
+    /* Фоны */
+    --bg-primary: #ffffff; /* Основной фон страницы (предположим белый) */
+    --bg-secondary: #f9f9f9; /* Фон форм */
+    --bg-navbar: #2c3e50;
+    --bg-navbar-link-hover: rgba(255, 255, 255, 0.1);
+    --bg-navbar-link-active: #3498db;
+    --bg-navbar-brand-hover: #3498db;
+    --bg-dropdown: #34495e;
+    --bg-dropdown-item-hover: #3498db;
+    --bg-input-navbar: rgba(236, 240, 241, 0.1);
+    --bg-input-navbar-focus: rgba(236, 240, 241, 0.2);
+    --bg-input-form: #ffffff;
+    --bg-button-search: #3498db;
+    --bg-button-search-hover: #2980b9;
+    --bg-button-major: #2980b9;
+    --bg-button-major-hover: #000000;
+    --bg-button-file: #eee;
+    --bg-button-file-hover: #ddd;
+    --bg-toggler: rgba(236, 240, 241, 0.1);
+  
+    /* Текст */
+    --text-primary: #222222; /* Основной текст, заголовки h2 */
+    --text-secondary: #555555; /* Метки форм */
+    --text-muted: #777777; /* Текст выбранного файла */
+    --text-navbar: #ecf0f1;
+    --text-navbar-brand-hover: #000000;
+    --text-navbar-link-hover: #3498db;
+    --text-navbar-active: #ffffff;
+    --text-dropdown: #ecf0f1;
+    --text-dropdown-hover: #ffffff;
+    --text-input-navbar: #ecf0f1;
+    --text-input-navbar-placeholder: rgba(236, 240, 241, 0.6);
+    --text-input-form: #333333;
+    --text-button-search: #ffffff;
+    --text-button-major: #222222;
+    --text-button-major-hover: #3498db;
+    --text-button-file: #333333;
+    --text-disabled: rgba(236, 240, 241, 0.4);
+  
+    /* Границы */
+    --border-color: #cccccc;
+    --border-color-focus: #3498db;
+    --border-profile: #3498db;
+    --border-divider: rgba(236, 240, 241, 0.1);
+    --border-toggler: none; /* У вас было none */
+  
+    /* Тени */
+    --shadow-navbar: 0 2px 10px rgba(0, 0, 0, 0.1);
+    --shadow-form: 0 2px 5px rgba(0, 0, 0, 0.1);
+    --shadow-dropdown: 0 5px 15px rgba(0, 0, 0, 0.2);
+    --shadow-input-focus: 0 0 5px rgba(52, 152, 219, 0.5);
+  
+    /* Иконки (как background-image) */
+    --icon-toggler: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(236, 240, 241, 1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+    --icon-search: url("search_24dp_F3F3F3.svg"); /* Путь к вашей светлой иконке */
+  
+    /* Другое */
+    --input-form-height: 28px; /* Для textarea */
+  }
+  
+  /* === Темная тема === */
+  /* Применяется, когда html имеет атрибут data-theme="dark" */
+  [data-theme="dark"] {
+    /* Фоны */
+    --bg-primary: #1a202c; /* Темный фон страницы */
+    --bg-secondary: #2d3748; /* Темный фон форм */
+    --bg-navbar: #1f2937; /* Чуть другой темный для навбара */
+    --bg-navbar-link-hover: rgba(255, 255, 255, 0.08);
+    --bg-navbar-link-active: #4a5568;
+    --bg-navbar-brand-hover: #4a5568; /* Фон при наведении на бренд */
+    --bg-dropdown: #2d3748;
+    --bg-dropdown-item-hover: #4a5568;
+    --bg-input-navbar: rgba(255, 255, 255, 0.06);
+    --bg-input-navbar-focus: rgba(255, 255, 255, 0.1);
+    --bg-input-form: #2d3748;
+    --bg-button-search: #4a5568;
+    --bg-button-search-hover: #5a6578;
+    --bg-button-major: #4a5568;
+    --bg-button-major-hover: #cbd5e0;
+    --bg-button-file: #4a5568;
+    --bg-button-file-hover: #2d3748;
+    --bg-toggler: rgba(255, 255, 255, 0.1);
+  
+    /* Текст */
+    --text-primary: #e2e8f0; /* Светлый текст */
+    --text-secondary: #a0aec0; /* Светлый вторичный текст */
+    --text-muted: #718096;
+    --text-navbar: #e2e8f0;
+    --text-navbar-brand-hover: #ffffff; /* Текст при наведении на бренд */
+    --text-navbar-link-hover: #90cdf4; /* Светло-голубой */
+    --text-navbar-active: #ffffff;
+    --text-dropdown: #e2e8f0;
+    --text-dropdown-hover: #ffffff;
+    --text-input-navbar: #e2e8f0;
+    --text-input-navbar-placeholder: rgba(226, 232, 240, 0.6);
+    --text-input-form: #e2e8f0;
+    --text-button-search: #e2e8f0;
+    --text-button-major: #e2e8f0;
+    --text-button-major-hover: #1a202c; /* Темный текст на светлом фоне */
+    --text-button-file: #e2e8f0;
+    --text-disabled: rgba(226, 232, 240, 0.4);
+  
+    /* Границы */
+    --border-color: #4a5568;
+    --border-color-focus: #90cdf4;
+    --border-profile: #90cdf4;
+    --border-divider: rgba(226, 232, 240, 0.1);
+    --border-toggler: none;
+  
+    /* Тени */
+    --shadow-navbar: 0 2px 10px rgba(0, 0, 0, 0.4); /* Темнее */
+    --shadow-form: 0 2px 5px rgba(0, 0, 0, 0.3);
+    --shadow-dropdown: 0 5px 15px rgba(0, 0, 0, 0.5);
+    --shadow-input-focus: 0 0 5px rgba(144, 205, 244, 0.5); /* Светло-голубое свечение */
+  
+    /* Иконки */
+    --icon-toggler: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(226, 232, 240, 1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e"); /* Белый штрих */
+    --icon-search: url("search_24dp_dark.svg"); /* Путь к вашей темной иконке поиска */
+  
+    /* Другое */
+    --input-form-height: 28px;
+  }
+  
+  /* Определение темы по умолчанию на основе настроек ОС */
+  @media (prefers-color-scheme: dark) {
+    :root {
+      /* Переопределяем переменные светлой темы на темные, ЕСЛИ нет явного data-theme */
+      /* Это гарантирует, что системная тема будет применена, если пользователь еще не выбрал */
+      /* Важно: Этот блок должен идти ПОСЛЕ основного :root */
+  
+      /* Копируем сюда все переменные из [data-theme="dark"] */
+      --bg-primary: #1a202c;
+      --bg-secondary: #2d3748;
+      --bg-navbar: #1f2937;
+      --bg-navbar-link-hover: rgba(255, 255, 255, 0.08);
+      --bg-navbar-link-active: #4a5568;
+      --bg-navbar-brand-hover: #4a5568;
+      --bg-dropdown: #2d3748;
+      --bg-dropdown-item-hover: #4a5568;
+      --bg-input-navbar: rgba(255, 255, 255, 0.06);
+      --bg-input-navbar-focus: rgba(255, 255, 255, 0.1);
+      --bg-input-form: #2d3748;
+      --bg-button-search: #4a5568;
+      --bg-button-search-hover: #5a6578;
+      --bg-button-major: #4a5568;
+      --bg-button-major-hover: #cbd5e0;
+      --bg-button-file: #4a5568;
+      --bg-button-file-hover: #2d3748;
+      --bg-toggler: rgba(255, 255, 255, 0.1);
+      --text-primary: #e2e8f0;
+      --text-secondary: #a0aec0;
+      --text-muted: #718096;
+      --text-navbar: #e2e8f0;
+      --text-navbar-brand-hover: #ffffff;
+      --text-navbar-link-hover: #90cdf4;
+      --text-navbar-active: #ffffff;
+      --text-dropdown: #e2e8f0;
+      --text-dropdown-hover: #ffffff;
+      --text-input-navbar: #e2e8f0;
+      --text-input-navbar-placeholder: rgba(226, 232, 240, 0.6);
+      --text-input-form: #e2e8f0;
+      --text-button-search: #e2e8f0;
+      --text-button-major: #e2e8f0;
+      --text-button-major-hover: #1a202c;
+      --text-button-file: #e2e8f0;
+      --text-disabled: rgba(226, 232, 240, 0.4);
+      --border-color: #4a5568;
+      --border-color-focus: #90cdf4;
+      --border-profile: #90cdf4;
+      --border-divider: rgba(226, 232, 240, 0.1);
+      --border-toggler: none;
+      --shadow-navbar: 0 2px 10px rgba(0, 0, 0, 0.4);
+      --shadow-form: 0 2px 5px rgba(0, 0, 0, 0.3);
+      --shadow-dropdown: 0 5px 15px rgba(0, 0, 0, 0.5);
+      --shadow-input-focus: 0 0 5px rgba(144, 205, 244, 0.5);
+      --icon-toggler: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(226, 232, 240, 1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+      --icon-search: url("search_24dp_dark.svg");
+      --input-form-height: 28px;
+    }
+  }
+  
+  /* Общие стили для всей страницы (если нужно) */
+  body {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      transition: background-color 0.3s ease, color 0.3s ease; /* Плавный переход для body */
+      font-family: 'Inter', sans-serif; /* Задаем основной шрифт здесь */
+  }
+  
+  /* --- Дальше идут ваши стили из stylenav.css и formsAndButtons.css, --- */
+  /* --- НО все цвета/фоны/границы заменены на var(--variable-name) --- */
+  
+  /* Пример рефакторинга stylenav.css */
+  .navbar {
+      background-color: var(--bg-navbar) !important;
+      box-shadow: 0 2px 10px, var(--shadow-navbar);
+      padding: 12px 20px;
+      font-family: 'Bitter', serif;
+      font-size: 16px;
+  }
+  
+  .navbar-brand {
+      font-family: 'Bitter', serif;
+      font-weight: 550;
+      color: var(--text-navbar) !important;
+      font-size: 22px;
+      transition: color 0.3s;
+  }
+  
+  .navbar-brand:hover {
+      color: var(--text-navbar-brand-hover) !important;
+      background-color: var(--bg-navbar-brand-hover);
+      border-radius: 4px;
+      padding: 0px 8px;
+      margin: 4px 0;
+      transform: translateX(-8px);
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  .navbar-nav .nav-link {
+      color: var(--text-navbar) !important;
+      font-weight: 400;
+      padding: 8px 15px;
+      border-radius: 4px;
+      transition: font-weight 0.45s ease; /* Добавляем переходы */
+      font-family: "Inter", sans-serif;
+      font-optical-sizing: auto;
+      font-style: normal;
+  }
+  
+  .navbar-nav .nav-link:hover {
+      background-color: var(--bg-navbar-link-hover);
+      color: var(--text-navbar-link-hover) !important;
+      font-weight: 750;
+  }
+  
+  .navbar-nav .active .nav-link {
+      background-color: var(--bg-navbar-link-active);
+      color: var(--text-navbar-active) !important;
+  }
+  
+  /* ... и так далее для ВСЕХ стилей в stylenav.css и formsAndButtons.css ... */
+  
+  /* Пример рефакторинга для иконки поиска */
+  .search-form::before {
+      content: "";
+      background-image: var(--icon-search); /* Используем переменную */
+      background-repeat: no-repeat;
+      position: absolute;
+      top: 50%;
+      left: 10px;
+      transform: translateY(-50%);
+      width: 24px;
+      height: 24px;
+      transition: background-image 0.3s ease; /* Плавный переход для иконки */
+  }
+  
+  /* Пример рефакторинга для .form-control из formsAndButtons.css */
+  .form-control {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      font-size: 16px;
+      box-sizing: border-box;
+      background-color: var(--bg-input-form); /* Фон поля */
+      color: var(--text-input-form); /* Цвет текста в поле */
+      transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .form-control:focus {
+      border-color: var(--border-color-focus);
+      outline: none;
+      box-shadow: var(--shadow-input-focus);
+  }
+  
+  textarea.form-control { /* Уточняем селектор для textarea */
+      height: auto; /* Позволяем автовысоте */
+      min-height: var(--input-form-height); /* Используем переменную */
+      resize: vertical;
+      min-height: 150px;
+  }
+  
+  /* Пример рефакторинга .major-button */
+  .major-button {
+      color: var(--text-button-major) !important;
+      background-color: var(--bg-button-major);
+      font-weight: 400;
+      padding: 8px 15px;
+      border-radius: 12px;
+      border: none;
+      transition: background-color 0.6s ease, border-radius 0.6s ease, color 0.6s ease, font-weight 0.6s ease;
+      font-family: "Inter", sans-serif;
+      font-optical-sizing: auto;
+      font-style: normal;
+      display: block;
+      margin-top: 20px;
+      width: 100%;
+      box-sizing: border-box;
+      cursor: pointer;
+  }
+  
+  .major-button:hover {
+      background-color: var(--bg-button-major-hover);
+      color: var(--text-button-major-hover) !important;
+      border-radius: 4px;
+      font-weight: 900;
+  }
+  
+  /* ... и так далее для ВСЕХ остальных стилей ... */
+  
+  /* Стили для кнопки переключения темы (пример) */
+  .theme-toggle-button {
+      background: none;
+      border: 1px solid var(--text-navbar); /* Граница в цвет текста навбара */
+      color: var(--text-navbar);
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s, color 0.3s;
+      font-size: 14px; /* Немного меньше */
+      margin-left: 15px; /* Отступ от других элементов */
+  }
+  
+  .theme-toggle-button:hover {
+      background-color: var(--bg-navbar-link-hover);
+      color: var(--text-navbar-link-hover);
+  }
+  
+  /* Добавим стили для иконок внутри кнопки (если будете использовать иконки) */
+  .theme-toggle-button .icon {
+      display: inline-block;
+      width: 1em;
+      height: 1em;
+      vertical-align: middle;
+      margin-right: 5px;
+  }
+  .theme-toggle-button .icon-sun { display: none; } /* По умолчанию скрыта */
+  .theme-toggle-button .icon-moon { display: inline-block; } /* По умолчанию видна */
+  
+  [data-theme="dark"] .theme-toggle-button .icon-sun { display: inline-block; } /* Показываем солнце в темной теме */
+  [data-theme="dark"] .theme-toggle-button .icon-moon { display: none; } /* Скрываем луну в темной теме */
+
+
+
+
+  /* static/css/theme.css */
+
+/* --- Базовые стили (можете оставить или адаптировать под светлую тему) --- */
+
+
+/* --- Стили для светлой темы (если используете класс .light-theme) --- */
+body.light-theme {
+    background-color: #fff;
+    color: #333;
+}
+.light-theme a {
+    color: #007bff;
+}
+.light-theme a:hover {
+    color: #0056b3;
+}
+/* Исходные стили для .some-form и h2 из formsAndButtons.css будут работать для светлой темы */
+
+
+/* --- Стили для темной темы --- */
+body.dark-theme {
+    background-color: #1e1e1e; /* Темный фон */
+    color: #e0e0e0; /* Светлый текст */
+    font-family: sans-serif; /* Убедитесь, что шрифт согласован */
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.dark-theme a {
+    color: #bb86fc; /* Цвет ссылок для темной темы */
+}
+.dark-theme a:hover {
+    color: #cfb3ff;
+}
+
+/* --- Переопределение стилей для .some-form и h2 в темной теме --- */
+
+/* Стили для форм */
+.dark-theme .some-form {
+    background-color: #2c2c2c; /* Темный фон для форм */
+    border-color: #555;      /* Темная граница */
+    color: #e0e0e0;          /* Светлый текст внутри форм */
+}
+
+/* Стили для полей ввода, select, textarea внутри форм */
+.dark-theme .some-form input[type="text"],
+.dark-theme .some-form input[type="email"],
+.dark-theme .some-form input[type="password"],
+.dark-theme .some-form input[type="number"],
+.dark-theme .some-form input[type="date"],
+.dark-theme .some-form select,
+.dark-theme .some-form textarea {
+    background-color: #3a3a3a; /* Темный фон полей */
+    color: #e0e0e0;          /* Светлый текст в полях */
+    border: 1px solid #666; /* Темная граница полей */
+}
+/* Стили для placeholder в темной теме */
+.dark-theme .some-form input::placeholder,
+.dark-theme .some-form textarea::placeholder {
+    color: #aaa; /* Более светлый placeholder */
+}
+
+
+/* Стили для label (меток полей) */
+.dark-theme .some-form label {
+     color: #c0c0c0; /* Светлый текст для меток */
+}
+
+/* Стили для заголовков h2 */
+.dark-theme h2 {
+    color: #f1f1f1;            /* Светлый цвет текста */
+    border-bottom-color: #444; /* Темный цвет нижней границы */
+}
+
+/* --- Дополнительные переопределения для других элементов (примеры) --- */
+
+/* Навигационная панель (если используется класс .navbar) */
+.dark-theme .navbar {
+     background-color: #212121;
+     border-bottom: 1px solid #444;
+}
+.dark-theme .navbar a,
+.dark-theme .navbar .navbar-brand,
+.dark-theme .navbar .nav-link {
+    color: #e0e0e0 !important; /* !important может понадобиться для переопределения Bootstrap */
+}
+.dark-theme .navbar a:hover,
+.dark-theme .navbar .navbar-brand:hover,
+.dark-theme .navbar .nav-link:hover {
+    color: #ffffff !important;
+}
+
+/* Footer */
+.dark-theme .footer {
+    background-color: #212121;
+    color: #aaa;
+    border-top: 1px solid #444;
+}
+.dark-theme .footer .text-muted {
+     color: #aaa !important; /* Переопределяем цвет Bootstrap */
+}
+
+/* Кнопки (адаптация цветов для лучшей читаемости) */
+.dark-theme .button,
+.dark-theme button,
+.dark-theme input[type="submit"],
+.dark-theme .btn-primary { /* Учитываем классы Bootstrap */
+    background-color: #3f51b5; /* Пример: индиго */
+    border-color: #3f51b5;
+    color: white;
+}
+.dark-theme .button:hover,
+.dark-theme button:hover,
+.dark-theme input[type="submit"]:hover,
+.dark-theme .btn-primary:hover {
+     background-color: #303f9f;
+     border-color: #303f9f;
+}
+/* Адаптация других типов кнопок */
+.dark-theme .button-secondary,
+.dark-theme .btn-secondary {
+    background-color: #545b62;
+    border-color: #545b62;
+    color: white;
+}
+.dark-theme .button-secondary:hover,
+.dark-theme .btn-secondary:hover {
+    background-color: #42484e;
+    border-color: #3f4449;
+}
+
+/* Уведомления (Alerts) */
+.dark-theme .alert {
+    border-width: 1px; /* Убедимся, что граница есть */
+}
+.dark-theme .alert-success {
+    color: #75b798; /* Светло-зеленый текст */
+    background-color: #1e4631; /* Темно-зеленый фон */
+    border-color: #2a6346; /* Темно-зеленая граница */
+}
+.dark-theme .alert-danger {
+    color: #ea868f; /* Светло-красный текст */
+    background-color: #58151c; /* Темно-красный фон */
+    border-color: #7c2a33; /* Темно-красная граница */
+}
+.dark-theme .alert-info {
+    color: #6ea8fe; /* Светло-синий текст */
+    background-color: #03285b; /* Темно-синий фон */
+    border-color: #0a438d; /* Темно-синяя граница */
+}
+.dark-theme .alert-warning {
+    color: #fdbf6e; /* Светло-желтый/оранжевый текст */
+    background-color: #664100; /* Темно-желтый/оранжевый фон */
+    border-color: #99640a; /* Темно-желтая/оранжевая граница */
+}
+/* Кнопка закрытия уведомления */
+.dark-theme .alert .close {
+    color: inherit; /* Наследуем цвет текста уведомления */
+    opacity: 0.8;
+}
+.dark-theme .alert .close:hover {
+    opacity: 1;
+}
+
+/* Таблицы */
+.dark-theme table, .dark-theme .table {
+    color: #e0e0e0;
+}
+.dark-theme thead, .dark-theme .table thead th {
+    color: #f1f1f1;
+    background-color: #3a3a3a;
+    border-color: #555;
+}
+.dark-theme tbody tr {
+    border-color: #555;
+}
+.dark-theme tbody tr:nth-of-type(odd) {
+    background-color: rgba(255, 255, 255, 0.05); /* Легкое чередование строк */
+}
+.dark-theme tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.1); /* Эффект при наведении */
+}
+.dark-theme .table-bordered,
+.dark-theme .table-bordered td,
+.dark-theme .table-bordered th {
+    border-color: #555; /* Видимые границы для таблиц с границами */
+}
