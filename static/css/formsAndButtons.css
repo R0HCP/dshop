@@ -1,28 +1,22 @@
-/* formsAndButtons.css */
-/* Использует переменные, определенные в theme.css */
 
-/* Стили для заголовка H2 (вне формы) */
-/* Примечание: В оригинале было два разных стиля для h2. Стандартизируем на один. */
 h2 {
     font-family: 'Bitter', serif;
     font-weight: 550;
-    color: var(--text-primary) !important; /* Используем переменную для основного текста */
+    color: var(--text-primary) !important;
     font-size: 22px;
     display: flex;
     margin-top: 12px;
     justify-content: center;
-    transition: color 0.3s ease; /* Плавный переход цвета */
+    transition: color 0.3s ease; 
 }
 
-/* Стили для основной кнопки (major-button) */
 .major-button {
-    color: var(--text-button-major) !important; /* Цвет текста кнопки */
-    background-color: var(--bg-button-major); /* Фон кнопки */
+    color: var(--text-button-major) !important;
+    background-color: var(--bg-button-major); 
     font-weight: 400;
     padding: 8px 15px;
     border-radius: 12px;
     border: none;
-    /* Объединенный transition из оригинала + добавлены переходы для темы */
     transition: background-color 0.6s ease, border-radius 0.6s ease, color 0.6s ease, font-weight 0.6s ease;
     font-family: "Inter", sans-serif;
     font-optical-sizing: auto;
@@ -35,36 +29,87 @@ h2 {
 }
 
 .major-button:hover {
-    background-color: var(--bg-button-major-hover); /* Фон кнопки при наведении */
-    color: var(--text-button-major-hover) !important; /* Цвет текста кнопки при наведении */
-    border-radius: 4px; /* Оставляем как в оригинале */
-    font-weight: 900;   /* Оставляем как в оригинале */
+    background-color: var(--bg-button-major-hover); 
+    color: var(--text-button-major-hover) !important; 
+    border-radius: 4px; 
+    font-weight: 900;   
 }
 
-/* Общие стили формы (.some-form) */
+.del{
+    
+    background-color: var(--bg-accent-red); 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 6px 12px;
+}
+.del:hover{
+
+    background-color: var(--bg-accent-red); 
+    color: var(--text-primary) !important; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 6px 12px;
+}
+
+.rem{
+    
+    background-color: var(--bg-accent-orange); 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 6px 12px;
+}
+.rem:hover{
+
+    color: var(--text-primary) !important; 
+    background-color: var(--bg-accent-orange); 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 6px 12px;
+}
+
+.add{
+    
+    background-color: var(--bg-accent-green); 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 6px 12px;
+}
+.add:hover{
+
+    background-color: var(--bg-accent-green); 
+    color: var(--text-primary) !important; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 6px 12px;
+}
+
 .some-form {
     max-width: 600px;
     margin: 20px auto;
     padding: 30px;
-    background-color: var(--bg-secondary); /* Фон формы */
+    background-color: var(--bg-secondary);
     border-radius: 8px;
-    box-shadow: var(--shadow-form); /* Тень формы */
+    box-shadow: var(--shadow-form);
     font-family: 'Inter', sans-serif;
-    transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Плавные переходы для темы */
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* Заголовок внутри формы */
+
+
+
 .some-form h2 {
     text-align: center;
     margin-bottom: 25px;
-    color: var(--text-primary); /* Используем ту же переменную, что и для внешнего h2 */
-    /* Убираем !important, т.к. специфичность селектора выше */
-    /* Убираем font-family, font-weight, font-size, т.к. наследуются или заданы выше */
-    /* Убираем display, justify-content, margin-top, т.к. центрирование задано text-align */
+    color: var(--text-primary);
     transition: color 0.3s ease;
 }
 
-/* Группа полей формы */
 .form-group {
     margin-bottom: 20px;
 }
@@ -72,56 +117,67 @@ h2 {
 .form-group label {
     display: block;
     margin-bottom: 8px;
-    color: var(--text-secondary); /* Цвет текста метки */
+    color: var(--text-secondary);
     font-weight: 600;
-    transition: color 0.3s ease; /* Плавный переход цвета метки */
+    transition: color 0.3s ease;
 }
 
-/* Стили для текстовых полей и textarea (.form-control) */
-/* ВАЖНО: Убедитесь, что эти стили не конфликтуют со стилями .form-control в stylenav.css */
-/* Если конфликт есть, используйте более специфичный селектор, например: .some-form .form-control */
 .form-control {
     width: 100%;
     padding: 10px;
-    border: 1px solid var(--border-color); /* Цвет рамки поля */
+    border: 1px solid var(--border-color);
     border-radius: 4px;
     font-size: 16px;
     box-sizing: border-box;
-    background-color: var(--bg-input-form); /* Фон поля ввода */
-    color: var(--text-input-form); /* Цвет текста в поле */
-    /* Объединенный transition из оригинала + добавлены переходы для темы */
+    background-color: var(--bg-input-form);
+    color: var(--text-input-form); 
     transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .form-control:focus {
-    border-color: var(--border-color-focus); /* Цвет рамки при фокусе */
+    border-color: var(--border-color-focus);
     outline: none;
-    box-shadow: var(--shadow-input-focus); /* Тень при фокусе */
-    /* Фон и цвет текста при фокусе обычно не меняют, но можно добавить, если нужно: */
-    /* background-color: var(--bg-input-form-focus); */
-    /* color: var(--text-input-form-focus); */
+    box-shadow: var(--shadow-input-focus);
 }
 
-/* Стили для полей типа number (убираем стрелки) */
+
+
 .form-control[type="number"] {
     -moz-appearance: textfield; /* Firefox */
 }
 
 .form-control[type="number"]::-webkit-outer-spin-button,
 .form-control[type="number"]::-webkit-inner-spin-button {
-    -webkit-appearance: none; /* Chrome, Safari, Edge */
+    -webkit-appearance: none; /* Chrome и прочий мусор */
     margin: 0;
 }
 
-/* Стили для textarea (применяем к textarea с классом form-control) */
-textarea.form-control {
-    resize: vertical; /* Разрешить вертикальное изменение размера */
-    min-height: 150px; /* Минимальная высота */
-    /* height: var(--input-form-height); /* Можно использовать переменную для НАЧАЛЬНОЙ высоты, если нужно */
-    /* В оригинале было height: 28px; что очень мало для textarea, min-height важнее */
+textarea {
+    background-color: var(--bg-primary);
+    color: var(--text-textarea); 
+    resize: vertical; 
+    width: 100%;
+    height: 90px;
+    border: 1px;
+    padding: 6px 18px;
+    border-radius: 8px;
 }
 
-/* Стили для группы файлового ввода */
+input{
+    background-color: var(--bg-primary);
+    color: var(--text-textarea); 
+    resize: vertical; 
+    border: none;
+    width: 100%;
+    border-radius: 8px;
+    padding: 6px 18px;
+    box-sizing: border-box;
+}
+input[type="checkbox"]{
+    width: 20px;
+}
+
+
 .form-group-file {
     margin-bottom: 20px;
 }
@@ -129,22 +185,21 @@ textarea.form-control {
 .form-group-file label {
     display: block;
     margin-bottom: 8px;
-    color: var(--text-secondary); /* Цвет текста метки */
+    color: var(--text-secondary);
     font-weight: 600;
-    transition: color 0.3s ease; /* Плавный переход цвета метки */
+    transition: color 0.3s ease;
 }
 
 .file-input-wrapper {
     position: relative;
-    display: inline-block; /* Или block, если нужно на всю ширину */
+    display: inline-block; 
 }
 
-/* Стилизация кнопки "Обзор..." */
 .file-input-button {
-    background-color: var(--bg-button-file); /* Фон кнопки файла */
-    color: var(--text-button-file); /* Цвет текста кнопки файла */
+    background-color: var(--bg-button-file); 
+    color: var(--text-button-file); 
     padding: 10px 15px;
-    border: 1px solid var(--border-color); /* Рамка кнопки файла */
+    border: 1px solid var(--border-color); 
     border-radius: 4px;
     cursor: pointer;
     display: inline-block;
@@ -152,31 +207,29 @@ textarea.form-control {
 }
 
 .file-input-button:hover {
-    background-color: var(--bg-button-file-hover); /* Фон при наведении */
+    background-color: var(--bg-button-file-hover); 
 }
 
-/* Скрытие стандартного input[type=file] */
-.file-input {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    opacity: 0;
-    cursor: pointer;
-    width: 100%;
-    height: 100%;
+input[type="file"]{
+/* файл оформить красиво */
 }
 
-/* Текст "Файл не выбран" */
 .file-selected-text {
     display: inline-block;
     margin-left: 10px;
-    color: var(--text-muted); /* Цвет приглушенного текста */
-    transition: color 0.3s ease; /* Плавный переход */
+    color: var(--text-muted); 
+    transition: color 0.3s ease;
 }
 
-/* Адаптивность */
+.pfp{
+    border-radius: 50%;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 200px !important;
+    height: 200px !important;
+}
+
 @media (max-width: 768px) {
     /* В оригинале было .add-service-form, исправлено на .some-form */
     .some-form {
@@ -184,7 +237,6 @@ textarea.form-control {
         margin: 10px; /* Уменьшаем отступы на маленьких экранах */
     }
 
-    /* В оригинале было .submit-button, исправлено на .major-button */
     .form-control,
     .major-button {
         font-size: 14px; /* Уменьшаем размер шрифта на маленьких экранах */

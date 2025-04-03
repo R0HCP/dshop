@@ -20,6 +20,12 @@
     {% endwith %}
 
     <form method="post" enctype="multipart/form-data" class="some-form"> {% comment %} enctype="multipart/form-data" для загрузки файлов {% endcomment %}
+        
+        {% if user.pfp %}
+        <img class="pfp" src="{{ user.pfp.url }}" alt="{{ user.title }}">
+        {% else %}
+        <span class="placeholder-text">Фото</span> 
+        {% endif %}
         {% csrf_token %}
         {{ form.as_p }}
         <button type="submit" class="major-button">Сохранить изменения</button>

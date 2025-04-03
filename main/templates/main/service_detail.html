@@ -1,64 +1,96 @@
 {% extends 'main/base.html' %}
+{% load static %} 
 
 {% block title %}{{ service.title }}{% endblock %}
 
+{% block head %}
+    <link rel="stylesheet" type="text/css" href="{% static 'main/css/service_detail.css' %}">
+    {{ block.super }} 
+{% endblock %}
+
 {% block content %}
-    <h2>{{ service.title }}</h2>
-    {% if service.images %}
-        <img src="{{ service.images.url }}" alt="{{ service.title }}" style="max-width: 300px;">
-    {% endif %}
-    <p>Описание: {{ service.description }}</p>
-    <p>Цена: {{ service.price }}</p>
-    {% if service.isAvaliable %}
-        <p>В наличии: {{ service.quantity }}</p>
-        {% if user.is_authenticated %}
-            <form method="post" action="{% url 'add_to_cart' service.id %}">
-                {% csrf_token %}
-                <label for="quantity">Количество:</label>
-                <input type="number" id="quantity" name="quantity" value="1" min="1">
-                <button type="submit">В корзину</button>
-            </form>
+<div class="service-detail-container">
+
+    <div class="photo-section">
+        {% if service.images %}
+            <img src="{{ service.images.url }}" alt="{{ service.title }}">
         {% else %}
-            <p>Для заказа необходимо <a href="{% url 'login' %}">войти</a> или <a href="{% url 'register' %}">зарегистрироваться</a>.</p>
-            <p>После добавления услуг в корзину, вы сможете оформить заказ.</p>
+            <span class="placeholder-text">Фото</span> 
         {% endif %}
-    {% else %}
-        <p>Нет в наличии</p>
-    {% endif %}
+    </div>
 
-    {% if user.is_authenticated and user == service.user %}
-        <p><a href="{% url 'edit_service' service.id %}">Редактировать услугу</a></p>
-    {% endif %}
+    <div class="info-row">
 
-    <hr>
+        <div class="details-section">
+            <h2>{{ service.title }}</h2>
+            <p><strong>Описание:</strong><br>{{ service.description|linebreaksbr }}</p>
+            <p><strong>Цена:</strong> {{ service.price }}</p>
 
-    <h3>Информация о продавце:</h3>
-    <p>Имя пользователя: {{ service.user.username }}</p>
-    {% if service.user.first_name or service.user.last_name %}
-        <p>Имя: {{ service.user.first_name }} {{ service.user.last_name }}</p>
-    {% endif %}
-    {% if service.user.email %}
-        <p>Email: <a href="mailto:{{ service.user.email }}">{{ service.user.email }}</a></p>
-    {% endif %}
-    {% if service.user.phone %}
-        <p>Телефон: {{ service.user.phone }}</p>
-    {% endif %}
-    {% if service.user.pfp %}
-        <img src="{{ service.user.pfp.url }}" alt="Фото профиля продавца" style="width: 50px; height: 50px; border-radius: 50%;">
-    {% endif %}
+            {% if service.isAvaliable %}
+                <p><strong>В наличии:</strong> {{ service.quantity }}</p>
+                {% if user.is_authenticated %}
+                    <form method="post" action="{% url 'add_to_cart' service.id %}">
+                        {% csrf_token %}
+                        <label for="quantity">Количество:</label>
+                        <input type="number" id="quantity" name="quantity" value="1" min="1" style="width: 60px; margin-right: 10px;">
+                        <button type="submit" class="major-button add">В корзину</button>
+                    </form>
+                {% else %}
+                    <p>Для заказа необходимо <a href="{% url 'login' %}?next={{ request.path }}">войти</a> или <a href="{% url 'register' %}?next={{ request.path }}">зарегистрироваться</a>.</p>
+                    <p>После добавления услуг в корзину, вы сможете оформить заказ.</p>
+                {% endif %}
+            {% else %}
+                <p><strong>Нет в наличии</strong></p>
+            {% endif %}
 
+            {% if user.is_authenticated and user == service.user %}
+                <p style="margin-top: 20px;"><a href="{% url 'edit_service' service.id %}">Редактировать услугу</a></p>
+            {% endif %}
+        </div>
+
+        {# Right Section: Seller Info ('продовец') #}
+        <div class="seller-section">
+            <h3>Информация о продавце:</h3>
+
+            <p>
+                {% if service.user.pfp %}
+                    <img src="{{ service.user.pfp.url }}" alt="Фото профиля {{ service.user.username }}" class="profile-pic">
+                {% endif %}
+                <strong>{{ service.user.username }}</strong>
+                 {% if service.user.isTrusted %}
+                     <strong style="color: green; font-size: 0.9em;">✔ Проверенный</strong>
+                 {% endif %}
+            </p>
+
+            {% if service.user.first_name or service.user.last_name %}
+                <p><strong>Имя:</strong> {{ service.user.get_full_name }}</p>
+            {% endif %}
+            {% if service.user.email %}
+                <p><strong>Email:</strong> <a href="mailto:{{ service.user.email }}">{{ service.user.email }}</a></p>
+            {% endif %}
+            {% if service.user.phone %}
+                <p><strong>Телефон:</strong> {{ service.user.phone }}</p>
+            {% endif %}
+
+        </div> {# End seller-section #}
+
+    </div> {# End info-row #}
+
+    {# Admin Actions Section (Placed below the main info row) #}
     {% if user.is_staff or user.is_superuser %}
-        <hr>
-        <h3>Действия администратора:</h3>
-        <form method="post" action="{% url 'delete_service' service.id %}">
-            {% csrf_token %}
-            <button type="submit" onclick="return confirm('Вы уверены, что хотите удалить эту услугу?')">Удалить услугу</button>
-        </form>
-        <form method="post" action="{% url 'toggle_trusted_from_service' service.user.id %}">
-            {% csrf_token %}
-            <input type="hidden" name="service_id" value="{{ service.id }}">
-            <button type="submit">{% if service.user.isTrusted %}Снять доверие у продавца{% else %}Сделать продавца доверенным{% endif %}</button>
-        </form>
+        <div class="admin-actions">
+            <h2>Действия администратора:</h2>
+            <form method="post" action="{% url 'delete_service' service.id %}">
+                {% csrf_token %}
+                <button type="submit" class="major-button del" onclick="return confirm('Вы уверены, что хотите удалить эту услугу?')">Удалить услугу</button>
+            </form>
+            <form method="post" action="{% url 'toggle_trusted_from_service' service.user.id %}">
+                {% csrf_token %}
+                <input type="hidden" name="service_id" value="{{ service.id }}"> {# Pass service ID for redirection if needed #}
+                <button type="submit" class="major-button rem" >{% if service.user.isTrusted %}Снять доверие у продавца{% else %}Сделать продавца доверенным{% endif %}</button>
+            </form>
+        </div>
     {% endif %}
 
+</div> {# End service-detail-container #}
 {% endblock %}

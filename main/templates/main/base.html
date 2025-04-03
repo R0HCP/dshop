@@ -16,6 +16,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,100..900;1,100..900&family=IBM+Plex+Serif:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/stylenav.css' %}">
+    <link rel="stylesheet" href="{% static 'css/service_detail.css' %}">
     <link rel="stylesheet" href="{% static 'css/formsAndButtons.css' %}">
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
@@ -49,9 +50,6 @@
     </nav> -->
 
 
-    {% load static %}
-    <script src="{% static 'js/theme-switcher.js' %}"></script>
-
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <a class="navbar-brand" href="/">Магазин маркетинга</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -67,11 +65,7 @@
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <a class="dropdown-item" href="#">Action</a>
                         <a class="dropdown-item" href="#">Another action</a>
-                        <button class="theme-toggle-button dropdown-item" id="theme-toggle" title="Переключить тему" aria-label="Переключить тему" aria-live="polite">
-                            <span class="icon icon-sun" aria-hidden="true">☀️</span> <!-- Иконка солнца (скрыта по умолчанию) -->
-                            <span class="icon icon-moon" aria-hidden="true">🌙</span> <!-- Иконка луны (видна по умолчанию) -->
-                            <span class="toggle-text">Светлая тема</span> <!-- Текст будет меняться JS -->
-                        </button>
+                        <button id="theme-switcher-btn">Переключить тему</button>
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="#">Something else here</a>
                     </div>
@@ -112,6 +106,6 @@
 
     {% block content %}
     {% endblock %}
-
+    <script src="{% static 'js/theme-switcher.js' %}"></script>
 </body>
 </html>

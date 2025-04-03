@@ -1,10 +1,18 @@
 {% extends 'main/base.html' %}
+{% load static %}
 
 {% block title %}Редактировать услугу "{{ service.title }}"{% endblock %}
 
 {% block content %}
     <h2>Редактировать услугу "{{ service.title }}"</h2>
     <form method="post" enctype="multipart/form-data" class="some-form">
+
+        {% if service.images %}
+        <img src="{{ service.images.url }}" alt="{{ service.title }}">
+        {% else %}
+        <span class="placeholder-text">Фото</span> 
+        {% endif %}
+
         {% csrf_token %}
         {{ form.as_p }}
         <button type="submit" class="major-button">Сохранить изменения</button>
