@@ -4,10 +4,9 @@
 
 
 {% block content %}
-
-    <form class="some-form" method="get" action="/">
-        <input type="text" name="search" id="search" value="{{ request.GET.search }}" placeholder="Введите текст для поиска">
-        <button type="submit">Найти</button>
+    <form class="some-form" style="display: flex; flex-direction: row; flex-wrap: nowrap; gap: 12px;" method="get" action="/">
+        <input type="text" name="search" id="search" value="{{ request.GET.search }}" placeholder="Введите текст для поиска" style="flex-grow: 0.85;">
+        <button type="submit" style="flex-grow: 0.15;">Найти</button>
     </form>
 
     <form class="some-form" method="get" action="/">
@@ -27,7 +26,7 @@
         <span id="price_from_value">{{ price_from_value }}</span>
         <input type="range" name="price_to" id="price_to" min="0" max="{{ max_price }}" value="{{ price_to_value }}"> {# Используем max_price и values из контекста #}
         <span id="price_to_value">{{ price_to_value }}</span>
-        <button type="submit">Применить</button>
+        <br><button style="margin-top: 16px;" type="submit">Применить</button>
     </form>
     
     <script>
