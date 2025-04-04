@@ -2,15 +2,15 @@
 
 {% block title %}Главная страница{% endblock %}
 
-{% block content %}
-    <h1>Список услуг</h1>
 
-    <form method="get" action="/">
+{% block content %}
+
+    <form class="some-form" method="get" action="/">
         <input type="text" name="search" id="search" value="{{ request.GET.search }}" placeholder="Введите текст для поиска">
         <button type="submit">Найти</button>
     </form>
 
-    <form method="get" action="/">
+    <form class="some-form" method="get" action="/">
         <label for="sort">Сортировать по:</label>
         <select name="sort" id="sort" onchange="this.form.submit()">
             <option value="">По умолчанию</option>
@@ -21,6 +21,29 @@
         </select>
     </form>
 
+    <form class="some-form" method="get" action="/">  {# Форма для range sliders #}
+        <label for="price_from">Цена:</label>
+        <input type="range" name="price_from" id="price_from" min="0" max="{{ max_price }}" value="{{ price_from_value }}"> {# Используем max_price и values из контекста #}
+        <span id="price_from_value">{{ price_from_value }}</span>
+        <input type="range" name="price_to" id="price_to" min="0" max="{{ max_price }}" value="{{ price_to_value }}"> {# Используем max_price и values из контекста #}
+        <span id="price_to_value">{{ price_to_value }}</span>
+        <button type="submit">Применить</button>
+    </form>
+    
+    <script>
+        const price_from = document.getElementById('price_from');
+        const price_from_value = document.getElementById('price_from_value');
+        const price_to = document.getElementById('price_to');
+        const price_to_value = document.getElementById('price_to_value');
+        
+        price_from.addEventListener('input', () => {
+            price_from_value.textContent = price_from.value;
+        });
+        
+        price_to.addEventListener('input', () => {
+            price_to_value.textContent = price_to.value;
+        });
+    </script>
     <ul>
         {% for service in services %}
         <li>

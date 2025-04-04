@@ -143,13 +143,21 @@ def calculate_estimated_completion_date(start_date, execution_time_days, holiday
     return current_date.date()
 
 
+
 def index(request):
     services = Service.objects.filter(isAvaliable=True)
+    max_price = Service.objects.filter(isAvaliable=True).order_by('-price').first()
+    if max_price:
+        max_price = int(max_price.price) # Получаем максимальную цену и преобразуем в int для range max
+    else:
+        max_price = 1000 # Дефолтное значение, если нет услуг
 
+    # Поиск
     search_query = request.GET.get('search')
     if search_query:
-        services = services.filter(title__icontains=search_query) # Поиск по названию
+        services = services.filter(title__icontains=search_query)
 
+    # Сортировка
     sort_by = request.GET.get('sort')
     if sort_by == 'price_asc':
         services = services.order_by('price')
@@ -160,8 +168,20 @@ def index(request):
     elif sort_by == 'title_desc':
         services = services.order_by('-title')
 
+    # Фильтрация по цене
+    price_from = request.GET.get('price_from')
+    price_to = request.GET.get('price_to')
+
+    if price_from:
+        services = services.filter(price__gte=price_from) # Фильтр "цена от" (больше или равно)
+    if price_to:
+        services = services.filter(price__lte=price_to) # Фильтр "цена до" (меньше или равно)
+
     context = {
         'services': services,
+        'max_price': max_price, # Передаем max_price в шаблон
+        'price_from_value': price_from or 0, # Передаем текущие значения или 0 по умолчанию
+        'price_to_value': price_to or max_price, # Передаем текущие значения или max_price по умолчанию
     }
     return render(request, 'main/index.html', context)
 
