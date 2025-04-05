@@ -1,51 +1,82 @@
-// static/js/theme-switcher.js
-document.addEventListener('DOMContentLoaded', () => {
-    const themeToggleBtn = document.getElementById('theme-switcher-btn');
-    const body = document.body;
+// dshop/static/js/theme-switcher.js
 
-    // Проверка, найдена ли кнопка
-    if (!themeToggleBtn) {
-        console.error("ОШИБКА: Кнопка с ID 'theme-switcher-btn' не найдена!");
-        return; // Если кнопки нет, дальше скрипт не выполнится
-    }
-     // Проверка, найден ли body
-     if (!body) {
-        console.error("ОШИБКА: Тег <body> не найден!");
-        return;
-    }
+(function() {
+    const htmlElement = document.documentElement;
+    const switchButton = document.getElementById('theme-switcher-btn');
+    const iconSun = document.getElementById('theme-icon-sun');
+    const iconMoon = document.getElementById('theme-icon-moon');
 
-    // Функция для установки начальной темы
-    const initializeTheme = () => {
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme === 'dark') {
-            body.classList.add('dark-theme'); // Применяем темную тему, если сохранена
-            console.log("Загружена темная тема (из localStorage)");
-        } else {
-            body.classList.remove('dark-theme'); // В остальных случаях - светлая (убираем класс темной)
-             console.log("Загружена светлая тема (по умолчанию или из localStorage)");
+    // Функция для применения темы
+    const applyTheme = (theme) => {
+        htmlElement.setAttribute('data-bs-theme', theme);
+        if (iconSun && iconMoon) {
+            if (theme === 'dark') {
+                iconSun.classList.add('d-none');
+                iconMoon.classList.remove('d-none');
+            } else {
+                iconSun.classList.remove('d-none');
+                iconMoon.classList.add('d-none');
+            }
         }
     };
 
-    // Функция для переключения темы при клике
+    // Функция для определения предпочитаемой ОС темы
+    const getPreferredTheme = () => {
+        // Сначала проверяем сохраненную тему в localStorage
+        try {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                return savedTheme;
+            }
+        } catch (e) {
+            console.error("LocalStorage error:", e);
+            // Если localStorage недоступен, продолжаем без сохраненной темы
+        }
+
+        // Если сохраненной темы нет, проверяем системные настройки
+        // window.matchMedia('(prefers-color-scheme: dark)').matches вернет true, если ОС в темном режиме
+        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    };
+
+    // Функция для переключения темы (остается такой же)
     const toggleTheme = () => {
-        body.classList.toggle('dark-theme'); // Добавляет класс, если его нет, убирает - если есть
-
-        // Сохраняем выбор в localStorage
-        if (body.classList.contains('dark-theme')) {
-            localStorage.setItem('theme', 'dark');
-            console.log("Переключено на темную тему. Выбор сохранен.");
-        } else {
-            localStorage.setItem('theme', 'light');
-             console.log("Переключено на светлую тему. Выбор сохранен.");
+        const currentTheme = htmlElement.getAttribute('data-bs-theme') || getPreferredTheme(); // Получаем текущую или предпочитаемую
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        applyTheme(newTheme);
+        // Сохраняем ЯВНЫЙ выбор пользователя в localStorage
+        try {
+            localStorage.setItem('theme', newTheme);
+        } catch (e) {
+            console.error("LocalStorage error:", e);
         }
     };
 
-    // Устанавливаем тему при загрузке страницы
-    initializeTheme();
+    // --- Применение темы при загрузке ---
+    const initialTheme = getPreferredTheme(); // Определяем тему (сохраненную или системную)
+    applyTheme(initialTheme); // Применяем ее
+    // --- Конец блока применения темы ---
 
-    // Вешаем обработчик клика на кнопку
-    console.log("Добавляем обработчик клика на кнопку...");
-    themeToggleBtn.addEventListener('click', toggleTheme);
-     console.log("Обработчик клика добавлен.");
+    // Навешиваем обработчик на кнопку
+    if (switchButton) {
+        switchButton.addEventListener('click', toggleTheme);
+    } else {
+        console.warn("Theme switcher button not found.");
+    }
 
-});
+    // (Опционально) Слушаем изменения системной темы,
+    // но ПЕРЕКЛЮЧАЕМ только если пользователь НЕ делал явный выбор
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+        try {
+            const savedTheme = localStorage.getItem('theme');
+            // Если пользователь НЕ сохранял тему вручную, следуем за системой
+            if (!savedTheme) {
+                applyTheme(event.matches ? 'dark' : 'light');
+            }
+        } catch (e) {
+            console.error("LocalStorage error:", e);
+            // В случае ошибки, возможно, стоит просто применить системную тему
+            applyTheme(event.matches ? 'dark' : 'light');
+        }
+    });
+
+})();

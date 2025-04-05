@@ -3,8 +3,8 @@
 {% block title %}Личный кабинет{% endblock %}
 
 {% block content %}
-    {% now "G" as current_hour_str %} {# Получаем час как строку #}
-    {% with current_hour=current_hour_str|add:0 %} {# Преобразуем в число #}
+    {% now "G" as current_hour_str %}  
+    {% with current_hour=current_hour_str|add:0 %} 
         <h2>
             {% if 5 <= current_hour and current_hour < 12 %}
                 Доброе утро

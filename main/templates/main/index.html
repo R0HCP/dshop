@@ -1,65 +1,135 @@
 {% extends 'main/base.html' %}
-
+{% load static %} 
 {% block title %}Главная страница{% endblock %}
 
-
 {% block content %}
-    <form class="some-form" style="display: flex; flex-direction: row; flex-wrap: nowrap; gap: 12px;" method="get" action="/">
-        <input type="text" name="search" id="search" value="{{ request.GET.search }}" placeholder="Введите текст для поиска" style="flex-grow: 0.85;">
-        <button type="submit" style="flex-grow: 0.15;">Найти</button>
-    </form>
-
-    <form class="some-form" method="get" action="/">
-        <label for="sort">Сортировать по:</label>
-        <select name="sort" id="sort" onchange="this.form.submit()">
-            <option value="">По умолчанию</option>
-            <option value="price_asc" {% if request.GET.sort == 'price_asc' %}selected{% endif %}>Цена (по возрастанию)</option>
-            <option value="price_desc" {% if request.GET.sort == 'price_desc' %}selected{% endif %}>Цена (по убыванию)</option>
-            <option value="title_asc" {% if request.GET.sort == 'title_asc' %}selected{% endif %}>Название (А-Я)</option>
-            <option value="title_desc" {% if request.GET.sort == 'title_desc' %}selected{% endif %}>Название (Я-А)</option>
-        </select>
-    </form>
-
-    <form class="some-form" method="get" action="/">  {# Форма для range sliders #}
-        <label for="price_from">Цена:</label>
-        <input type="range" name="price_from" id="price_from" min="0" max="{{ max_price }}" value="{{ price_from_value }}"> {# Используем max_price и values из контекста #}
-        <span id="price_from_value">{{ price_from_value }}</span>
-        <input type="range" name="price_to" id="price_to" min="0" max="{{ max_price }}" value="{{ price_to_value }}"> {# Используем max_price и values из контекста #}
-        <span id="price_to_value">{{ price_to_value }}</span>
-        <br><button style="margin-top: 16px;" type="submit">Применить</button>
-    </form>
-    
-    <script>
-        const price_from = document.getElementById('price_from');
-        const price_from_value = document.getElementById('price_from_value');
-        const price_to = document.getElementById('price_to');
-        const price_to_value = document.getElementById('price_to_value');
-        
-        price_from.addEventListener('input', () => {
-            price_from_value.textContent = price_from.value;
-        });
-        
-        price_to.addEventListener('input', () => {
-            price_to_value.textContent = price_to.value;
-        });
-    </script>
-    <ul>
-        {% for service in services %}
-        <li>
-            <a href="{% url 'service_detail' service.id %}">
-                {% if service.images %}
-                    <img src="{{ service.images.url }}" alt="{{ service.title }}" style="max-width: 100px;">
-                {% endif %}
-                <h3>{{ service.title }}</h3>
-                <p>Цена: {{ service.price }}</p>
-            </a>
-            <form method="post" action="{% url 'add_to_cart' service.id %}">
-                {% csrf_token %}
-                <button type="submit">В корзину</button>
+    <div class="row mb-4">
+        <div class="col-md-6 mb-3 mb-md-0">
+            <form method="get" action="{% url 'index' %}"> 
+                <div class="input-group">
+                    <input type="text" class="form-control" name="search" value="{{ request.GET.search }}" placeholder="Поиск услуг...">
+                    <button class="btn btn-outline-secondary" type="submit">Найти</button>
+                </div>
             </form>
-        </li>
+        </div>
+
+        <div class="col-md-6">
+            <form method="get" action="{% url 'index' %}" class="d-flex justify-content-md-end align-items-center">
+                 {% if request.GET.search %}
+                 <input type="hidden" name="search" value="{{ request.GET.search }}">
+                 {% endif %}
+                 {% if request.GET.price_from %}
+                 <input type="hidden" name="price_from" value="{{ request.GET.price_from }}">
+                 {% endif %}
+                 {% if request.GET.price_to %}
+                 <input type="hidden" name="price_to" value="{{ request.GET.price_to }}">
+                 {% endif %}
+
+                <label for="sort" class="form-label me-2 mb-0">Сортировать:</label>
+                <select class="form-select w-auto" name="sort" id="sort" onchange="this.form.submit()">
+                    <option value="">По умолчанию</option>
+                    <option value="price_asc" {% if request.GET.sort == 'price_asc' %}selected{% endif %}>Цена ↑</option>
+                    <option value="price_desc" {% if request.GET.sort == 'price_desc' %}selected{% endif %}>Цена ↓</option>
+                    <option value="title_asc" {% if request.GET.sort == 'title_asc' %}selected{% endif %}>Название (А-Я)</option>
+                    <option value="title_desc" {% if request.GET.sort == 'title_desc' %}selected{% endif %}>Название (Я-А)</option>
+                </select>
+            </form>
+        </div>
+    </div>
+
+    <form class="card card-body mb-4" method="get" action="{% url 'index' %}">
+         {% if request.GET.search %}
+         <input type="hidden" name="search" value="{{ request.GET.search }}">
+         {% endif %}
+         {% if request.GET.sort %}
+         <input type="hidden" name="sort" value="{{ request.GET.sort }}">
+         {% endif %}
+
+        <h5 class="card-title">Фильтр по цене</h5>
+        <div class="row">
+            <div class="col-md-6 mb-3 mb-md-0">
+                <label for="price_from" class="form-label">От: <span id="price_from_value">{{ price_from_value }}</span> руб.</label>
+                <input type="range" class="form-range" name="price_from" id="price_from" min="0" max="{{ max_price }}" value="{{ price_from_value }}">
+            </div>
+            <div class="col-md-6">
+                <label for="price_to" class="form-label">До: <span id="price_to_value">{{ price_to_value }}</span> руб.</label>
+                <input type="range" class="form-range" name="price_to" id="price_to" min="0" max="{{ max_price }}" value="{{ price_to_value }}">
+            </div>
+        </div>
+        <button class="btn btn-primary mt-3 align-self-start" type="submit">Применить фильтр</button>
+    </form>
+
+    <h2>Наши Услуги</h2>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mt-3">
+        {% for service in services %}
+            <div class="col">
+                <div class="card h-100 shadow-sm"> 
+                    {% if service.images %} 
+                        <img src="{{ service.images.url }}" class="card-img-top" alt="{{ service.title }}" style="height: 200px; object-fit: cover;">
+                    {% else %}
+                        <img src="{% static 'images/placeholder.png' %}" class="card-img-top" alt="Нет изображения" style="height: 200px; object-fit: cover; background-color: #eee;">
+                    {% endif %}
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">{{ service.title }}</h5>
+                        <p class="card-text flex-grow-1">{{ service.description|truncatewords:20 }}</p> 
+                        <p class="card-text fs-5 fw-bold">{{ service.price }} руб.</p> 
+                        <p class="card-text"><small class="text-body-secondary"> 
+                            Продавец: {{ service.user.username }}
+                            {% if service.user.isTrusted %}
+                                <i class="bi bi-patch-check-fill text-primary ms-1" title="Проверенный продавец"></i>
+                            {% endif %}
+                        </small></p>
+                        <a href="{% url 'service_detail' service.id %}" class="btn btn-primary mt-auto">Подробнее</a>
+
+                           <div class="mt-2 d-grid">
+                             <form method="post" action="{% url 'add_to_cart' service.id %}" class="d-inline">
+                               {% csrf_token %}
+                               <button type="submit" class="btn btn-outline-success w-100">В корзину</button>
+                             </form>
+                           </div>
+
+                    </div>
+                </div>
+            </div>
         {% empty %}
-            <li>Нет доступных услуг.</li>
+            <div class="col-12">
+                <p>По вашему запросу услуг не найдено. Попробуйте изменить параметры фильтрации.</p>
+            </div>
         {% endfor %}
-    </ul>
+    </div>
+
+    <script>
+        const price_from_slider = document.getElementById('price_from');
+        const price_from_value_display = document.getElementById('price_from_value');
+        const price_to_slider = document.getElementById('price_to');
+        const price_to_value_display = document.getElementById('price_to_value');
+        const maxPrice = { max_price }; 
+
+        function updatePriceValues() {
+            let fromVal = parseInt(price_from_slider.value, 10);
+            let toVal = parseInt(price_to_slider.value, 10);
+
+         
+            if (fromVal > toVal) {
+               
+                if (event && event.target.id === 'price_from') {
+                    toVal = fromVal;
+                    price_to_slider.value = toVal;
+                } else { 
+                    fromVal = toVal;
+                    price_from_slider.value = fromVal;
+                }
+            }
+
+            price_from_value_display.textContent = fromVal;
+            price_to_value_display.textContent = toVal;
+        }
+
+        if (price_from_slider && price_to_slider) {
+            price_from_slider.addEventListener('input', updatePriceValues);
+            price_to_slider.addEventListener('input', updatePriceValues);
+
+        }
+    </script>
+
 {% endblock %}

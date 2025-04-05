@@ -1,112 +1,95 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1"> 
+    <title>{% block title %}Сомнительный диплом{% endblock %}</title>
 
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/theme.css' %}">
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=PT+Serif:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,100..900;1,100..900&family=IBM+Plex+Serif:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/stylenav.css' %}">
-    <link rel="stylesheet" href="{% static 'css/service_detail.css' %}">
-    <link rel="stylesheet" href="{% static 'css/formsAndButtons.css' %}">
-    <link rel="stylesheet" href="{% static 'css/index.css' %}">
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    
 </head>
 <body>
 
-    <!-- <nav>
-        <a href="/">Главная</a>
-        <a href="{% url 'view_cart' %}">Корзина</a> 
-        {% if user.is_authenticated %}
-            <div style="display: inline-block;">
-                <a href="{% url 'profile' %}" style="display: inline-block; vertical-align: middle;">
-                    {% if user.pfp %}
-                        <img src="{{ user.pfp.url }}" alt="Фото профиля" style="width: 30px; height: 30px; border-radius: 50%; vertical-align: middle; margin-right: 5px;">
-                    {% else %}
-                        <span style="display: inline-block; width: 30px; height: 30px; border-radius: 50%; background-color: #ccc; text-align: center; line-height: 30px; vertical-align: middle; margin-right: 5px;">👤</span>
-                    {% endif %}
-                    {{ user.username }}
-                </a>
-                <a href="{% url 'logout' %}" style="display: inline-block; vertical-align: middle; margin-left: 10px;">Выход</a>
-            </div>
-            {% if user.isTrusted %}
-                <a href="{% url 'add_service' %}">Добавить услугу</a>
-            {% endif %}
-        {% else %}
-            <a href="{% url 'register' %}">Регистрация</a>
-            <a href="{% url 'login' %}">Вход</a>
-        {% endif %}
-    </nav> -->
-
-
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="/">Магазин маркетинга</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary border-bottom"> 
+      <div class="container-fluid">
+        <a class="navbar-brand" href="/">Магазин Маркетинга</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
         </button>
-    
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav mr-auto">    
-                <li class="nav-item dropdown d-flex align-items-center">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Dropdown
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="#">Action</a>
-                        <a class="dropdown-item" href="#">Another action</a>
-                        <button id="theme-switcher-btn">Переключить тему</button>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="#">Something else here</a>
-                    </div>
-                </li>
-                <li class="nav-item d-flex align-items-center">
-                    {% if user.isTrusted %}
-                    <a href="{% url 'add_service' %}" class="nav-link d-flex align-items-center me-2">Добавить услугу</a>
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="/">Главная</a>
+            </li>
+            {% if user.isTrusted %}
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'add_service' %}">Добавить услугу</a>
+            </li>
+            {% endif %}
+          </ul>
+          <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
+             <li class="nav-item me-2">
+                 <a href="{% url 'view_cart' %}" class="btn btn-outline-primary position-relative">
+                    <i class="bi bi-cart"></i> Корзина
+                    {% if cart_item_count > 0 %}
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                      {{ cart_item_count }}
+                      <span class="visually-hidden">items in cart</span>
+                    </span> 
                     {% endif %}
-                </li>
-            </ul>
-
-            <ul class="navbar-nav "> 
+                  </a>
+             </li>
+             <li class="nav-item me-2">
+                <button id="theme-switcher-btn" class="btn btn-secondary">
+                    <i class="bi bi-sun" id="theme-icon-sun"></i>
+                    <i class="bi bi-moon-stars-fill d-none" id="theme-icon-moon"></i>
+                </button>
+            </li>
             {% if user.is_authenticated %}
-            <li class="nav-item d-flex align-items-center">
-                 <a href="{% url 'profile' %}" class="nav-link d-flex align-items-center me-2"> {% if user.pfp %}
-                        <img src="{{ user.pfp.url }}" alt="Фото профиля" style="width: 30px; height: 30px; border-radius: 50%; margin-right: 5px;">
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    {% if user.pfp %}
+                        <img src="{{ user.pfp.url }}" alt="Фото" style="width: 30px; height: 30px; border-radius: 50%; margin-right: 8px;">
                     {% else %}
-                        <span style="display: inline-block; width: 30px; height: 30px; border-radius: 50%; background-color: #ccc; text-align: center; line-height: 30px; margin-right: 5px;">👤</span>
+                        <i class="bi bi-person-circle me-2 fs-4"></i>
                     {% endif %}
                     {{ user.username }}
-                </a>
-                <a href="{% url 'logout' %}" class="nav-link">Выход</a>
-            </li>
-
-        {% else %}
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'register' %}">Регистрация</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'login' %}">Вход</a>
-            </li>
-        {% endif %}
-            </ul>   
+                  </a>
+                  <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="{% url 'profile' %}">Профиль</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="{% url 'logout' %}">Выход</a></li>
+                  </ul>
+                </li>
+            {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'register' %}">Регистрация</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'login' %}">Вход</a>
+                </li>
+            {% endif %}
+          </ul>
         </div>
+      </div>
     </nav>
 
+    <main class="container mt-4"> 
+        {% block content %}
+        {% endblock %}
+    </main>
 
+    <footer class="container mt-5 py-3 border-top text-center">
+        <p>&copy; Сомнительный диплом {% now "Y" %}</p>
+    </footer>
 
-    {% block content %}
-    {% endblock %}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="{% static 'js/theme-switcher.js' %}"></script>
+    <script src="{% static 'js/price-slider.js' %}"></script>
+
 </body>
 </html>

@@ -4,60 +4,116 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.admin.views.decorators import staff_member_required
 from .forms import CustomUserCreationForm, CustomAuthenticationForm, AddServiceForm, OrderServiceForm, EditServiceForm 
-from .models import Service, Order, Holiday 
+from .models import Service, Order, Holiday, User
 from .forms import UserProfileEditForm
 from django.http import HttpResponse, HttpResponseForbidden, JsonResponse 
 import datetime
-
 
 @login_required # Оформление заказа только для зарегистрированных пользователей
 def checkout_view(request):
     cart = request.session.get('cart', {})
     cart_items = []
     total_price = 0
+    errors = [] # Список для хранения сообщений об ошибках
 
     if not cart:
-        return HttpResponse("Ваша корзина пуста.") # Или перенаправить на страницу корзины
+        # Если корзина пуста изначально
+        return render(request, 'main/cart.html', {'cart_items': [], 'total_price': 0, 'errors': ['Ваша корзина пуста.']})
 
-    for service_id, quantity in cart.items():
-        service = get_object_or_404(Service, pk=service_id)
-        item_total_price = service.price * quantity
-        cart_items.append({
-            'service': service,
-            'quantity': quantity,
-            'total_price': item_total_price,
-        })
-        total_price += item_total_price
+    # Сначала соберем информацию и проверим наличие
+    for service_id, quantity in list(cart.items()): # Используем list(), чтобы можно было удалять элементы во время итерации
+        try:
+            service = Service.objects.get(pk=service_id) # Используем get вместо get_object_or_404 для ручной обработки
+            if not service.isAvaliable:
+                 errors.append(f"Услуга '{service.title}' больше недоступна.")
+                 del cart[service_id] # Удаляем из корзины, если недоступна
+                 continue # Переходим к следующему товару
 
-    if request.method == 'POST': # Обработка POST запроса (например, после подтверждения заказа)
-        # Здесь можно добавить логику создания заказа в базе данных
-        # и обработки оплаты (если необходимо)
+            if service.quantity < quantity:
+                errors.append(f"Недостаточное количество для услуги '{service.title}'. Доступно: {service.quantity}, запрошено: {quantity}.")
+                # Опционально: можно уменьшить количество в корзине до доступного
+                # cart[service_id] = service.quantity
+                # quantity = service.quantity
+                # Или просто удалить, если не хотим продавать меньше
+                del cart[service_id]
+                continue # Переходим к следующему товару
 
-        # Создание заказа (пример - нужно адаптировать под вашу логику)
+            item_total_price = service.price * quantity
+            cart_items.append({
+                'service': service,
+                'quantity': quantity,
+                'total_price': item_total_price,
+            })
+            total_price += item_total_price
+
+        except Service.DoesNotExist:
+             errors.append(f"Услуга с ID {service_id} не найдена.")
+             del cart[service_id] # Удаляем из корзины, если не найдена
+
+    # Обновляем сессию с возможными изменениями в корзине
+    request.session['cart'] = cart
+
+    # Если после проверок корзина опустела или были ошибки и нет POST-запроса
+    if not cart_items and request.method != 'POST':
+         # Перенаправляем обратно в корзину с сообщениями об ошибках
+         # Сохраняем ошибки в сессии или передаем их в контекст шаблона корзины
+         # Пример сохранения в сессии (потребуется отобразить их в шаблоне cart.html):
+         request.session['cart_errors'] = errors
+         return redirect('view_cart') # Или рендерим checkout.html с ошибками
+
+    if request.method == 'POST':
+        # Если были ошибки на этапе проверки, не позволяем оформить заказ
+        if errors:
+             context = {
+                 'cart_items': cart_items, # Показываем то, что осталось
+                 'total_price': total_price,
+                 'errors': errors, # Показываем ошибки
+             }
+             return render(request, 'main/checkout.html', context)
+
+        # Ошибок нет, создаем заказы
         for item in cart_items:
             service = item['service']
             quantity = item['quantity']
+
+            # ---- ВАЖНО: Повторная проверка на всякий случай (параллельные запросы) ----
+            service.refresh_from_db() # Обновляем данные из БД
+            if service.quantity < quantity or not service.isAvaliable:
+                 # Обработка редкого случая, когда товар закончился между проверкой и POST-запросом
+                 request.session['cart_errors'] = [f"К сожалению, количество товара '{service.title}' изменилось. Пожалуйста, проверьте корзину."]
+                 # Очищаем только этот товар из сессии корзины
+                 current_cart = request.session.get('cart', {})
+                 if str(service.id) in current_cart:
+                     del current_cart[str(service.id)]
+                     request.session['cart'] = current_cart
+                 return redirect('view_cart')
+            # ---- Конец повторной проверки ----
+
             order = Order.objects.create(
                 user=request.user,
                 service=service,
                 quantity=quantity,
                 total_price=item['total_price']
+                # Расчет estimated_completion_date можно добавить и сюда, если нужно
             )
             service.quantity -= quantity
             if service.quantity == 0:
                 service.isAvaliable = False
-            service.save()
+            service.save() # Теперь эта строка безопасна
 
-        # Очистка корзины после оформления заказа
-        del request.session['cart']
+        # Очистка корзины после успешного оформления заказа
+        # del request.session['cart'] # Перенесено выше, т.к. корзина могла измениться
 
-        return render(request, 'main/checkout_success.html', {'total_price': total_price}) # Страница успешного оформления заказа
+        return render(request, 'main/checkout_success.html', {'total_price': total_price})
 
+    # Если метод GET и есть товары (прошли проверку или не было ошибок)
     context = {
         'cart_items': cart_items,
         'total_price': total_price,
+        'errors': errors, # Передаем ошибки, если они были на этапе GET
     }
-    return render(request, 'main/checkout.html', context) # Страница оформления заказа (форма подтверждения)
+    # Отображаем страницу подтверждения заказа
+    return render(request, 'main/checkout.html', context)
 
 @login_required
 def order_service_view(request, service_id):
@@ -99,34 +155,6 @@ def order_service_view(request, service_id):
 
 
 
-# @login_required
-# def order_service_view(request, service_id):
-#     service = get_object_or_404(Service, pk=service_id)
-#     if request.method == 'POST':
-#         form = OrderServiceForm(request.POST)
-#         if form.is_valid():
-#             quantity = form.cleaned_data['quantity']
-#             if service.quantity >= quantity:
-#                 total_price = service.price * quantity
-#                 order = Order.objects.create(user=request.user, service=service, quantity=quantity, total_price=total_price)
-#                 service.quantity -= quantity
-#                 if service.quantity == 0:
-#                     service.isAvaliable = False
-#                 service.save()
-
-#                 # Расчет даты выполнения
-#                 holidays = Holiday.objects.all()
-#                 start_date = order.created_at
-#                 estimated_completion_date = calculate_estimated_completion_date(start_date, service.execution_time_days, holidays)
-#                 order.estimated_completion_date = estimated_completion_date
-#                 order.save()
-
-#                 return render(request, 'main/order_success.html', {'order_id': order.id, 'seller': service.user, 'completion_date': estimated_completion_date}) # Передаем дату в контекст
-#             else:
-#                 return HttpResponse("Извините, недостаточно товара на складе.")
-#     else:
-#         form = OrderServiceForm()
-#     return render(request, 'main/order_form.html', {'form': form, 'service': service})
 
 def calculate_estimated_completion_date(start_date, execution_time_days, holidays):
     current_date = start_date
@@ -201,16 +229,22 @@ def delete_service_view(request, service_id):
     service.delete()
     return redirect('index') 
 
-@staff_member_required 
-def toggle_trusted_from_service_view(request, user_id): 
+@staff_member_required # Убедитесь, что только админ может это делать
+def toggle_trusted_from_service_view(request, user_id):
     if request.method == 'POST':
+        service_id = request.POST.get('service_id')
+        if not service_id:
+             return HttpResponseForbidden("Не указан ID услуги для возврата.")
+
         try:
-            user = User.objects.get(pk=user_id)
+            user = User.objects.get(pk=user_id) # 'User' теперь должно быть определено
             user.isTrusted = not user.isTrusted
             user.save()
-            return redirect('service_detail', service_id=request.POST.get('service_id')) 
-        except User.DoesNotExist:
+            return redirect('service_detail', service_id=service_id)
+        except User.DoesNotExist: # 'User' теперь должно быть определено
             return HttpResponseForbidden("Пользователь не найден.")
+        except ValueError:
+            return HttpResponseForbidden("Некорректный ID услуги для возврата.")
     else:
         return HttpResponseForbidden("Недопустимый метод запроса.")
 
@@ -244,26 +278,7 @@ def logout_view(request):
     logout(request)
     return redirect('index') 
 
-# @login_required 
-# def order_service_view(request, service_id):
-#     service = get_object_or_404(Service, pk=service_id)
-#     if request.method == 'POST':
-#         form = OrderServiceForm(request.POST)
-#         if form.is_valid():
-#             quantity = form.cleaned_data['quantity']
-#             if service.quantity >= quantity: 
-#                 total_price = service.price * quantity
-#                 order = Order.objects.create(user=request.user, service=service, quantity=quantity, total_price=total_price)
-#                 service.quantity -= quantity 
-#                 if service.quantity == 0:
-#                     service.isAvaliable = False 
-#                 service.save()
-#                 return render(request, 'main/order_success.html', {'order_id': order.id}) 
-#             else:
-#                 return HttpResponse("Извините, недостаточно товара на складе.") 
-#     else:
-#         form = OrderServiceForm()
-#     return render(request, 'main/order_form.html', {'form': form, 'service': service}) 
+
 
 def is_trusted_user(user): 
     return user.is_authenticated and user.isTrusted
@@ -302,28 +317,6 @@ def edit_service_view(request, service_id):
     }
     return render(request, 'main/edit_service.html', context)
 
-
-
-# @login_required
-# def order_service_view(request, service_id):
-#     service = get_object_or_404(Service, pk=service_id)
-#     if request.method == 'POST':
-#         form = OrderServiceForm(request.POST)
-#         if form.is_valid():
-#             quantity = form.cleaned_data['quantity']
-#             if service.quantity >= quantity:
-#                 total_price = service.price * quantity
-#                 order = Order.objects.create(user=request.user, service=service, quantity=quantity, total_price=total_price)
-#                 service.quantity -= quantity
-#                 if service.quantity == 0:
-#                     service.isAvaliable = False
-#                 service.save()
-#                 return render(request, 'main/order_success.html', {'order_id': order.id, 'seller': service.user}) # Передаем продавца в контекст
-#             else:
-#                 return HttpResponse("Извините, недостаточно товара на складе.")
-#     else:
-#         form = OrderServiceForm()
-#     return render(request, 'main/order_form.html', {'form': form, 'service': service})
 
 
 
