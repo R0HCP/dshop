@@ -75,6 +75,36 @@
         <button class="btn btn-primary mt-3 align-self-start" type="submit">Применить фильтр</button>
     </form>
 
+
+
+    {% if pending_services %}
+    <h2>Услуги на модерации</h2>
+    <ul>
+        {% for service in pending_services %}
+            <li>
+                <a href="{% url 'service_detail' service.id %}">
+                    {% if service.images %}
+                        <img src="{{ service.images.url }}" alt="{{ service.title }}" style="max-width: 100px;">
+                    {% endif %}
+                    <h3>{{ service.title }} (На модерации)</h3>
+                    <p>Цена: {{ service.price }}</p>
+                    <p>Категория: {% if service.category %} {{ service.category.name }} {% else %} Нет категории {% endif %}</p>
+                </a>
+                <form method="post" action="{% url 'approve_service_from_index' service.id %}" style="display: inline;"> 
+                    {% csrf_token %}
+                    <button type="submit">Одобрить</button>
+                </form>
+                <form method="post" action="{% url 'reject_service_from_index' service.id %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit">Отклонить</button>
+                </form>
+            </li>
+        {% endfor %}
+    </ul>
+    <hr>
+{% endif %}
+
+
     <h2>Наши Услуги</h2>
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mt-3">
         {% for service in services %}

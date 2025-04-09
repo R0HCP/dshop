@@ -1,5 +1,6 @@
 from django.contrib import admin
 from .models import User, Service, Order, Transaction, Holiday, Category 
+import datetime
 
 def toggle_is_trusted_action(modeladmin, request, queryset):
     for user in queryset:
@@ -17,9 +18,28 @@ class UserAdmin(admin.ModelAdmin):
     list_filter = ('isTrusted', 'is_staff', 'is_superuser') 
     actions = [toggle_is_trusted_action]
  
+def approve_services(modeladmin, request, queryset):
+    for service in queryset:
+        service.status = 'approved'
+        service.moderated_by = request.user 
+        service.moderated_at = datetime.datetime.now()
+        service.save()
+approve_services.short_description = "Одобрить выбранные услуги"
+
+def reject_services(modeladmin, request, queryset): 
+    for service in queryset:
+        service.status = 'rejected'
+        service.moderated_by = request.user 
+        service.moderated_at = datetime.datetime.now()
+        service.save()
+reject_services.short_description = "Отклонить выбранные услуги"
+
 class ServiceAdmin(admin.ModelAdmin):
-    list_display = ('title', 'price', 'isAvaliable', 'execution_time_days', 'category') 
-    list_editable = ('isAvaliable', 'execution_time_days', 'category') 
+    list_display = ('title', 'price', 'isAvaliable', 'execution_time_days', 'category', 'status', 'moderated_by', 'moderated_at') 
+    list_editable = ('isAvaliable', 'execution_time_days', 'category', 'status') 
+    list_filter = ('status', 'category', 'moderated_by', 'moderated_at') 
+    actions = [approve_services, reject_services] 
+
 
 admin.site.register(User, UserAdmin) # для админки
 admin.site.register(Service, ServiceAdmin) # да, и что теперь? 

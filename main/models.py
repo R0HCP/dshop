@@ -2,8 +2,9 @@ from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, UserManager # <--- Импортируем AbstractBaseUser, PermissionsMixin и UserManager
 
-
 class User(AbstractBaseUser, PermissionsMixin): 
+
+    
     username = models.CharField(max_length=250, unique=True) 
     password = models.CharField(max_length=250) 
     email = models.EmailField(null=True, blank=True)
@@ -17,7 +18,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = 'username' # 
     REQUIRED_FIELDS = [] 
 
-    objects = UserManager() # Добавляем UserManager для работы с AbstractBaseUser
+    objects = UserManager() 
 
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
@@ -25,9 +26,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.username
 
-class Category(models.Model): # <--- Новая модель Category
+class Category(models.Model): 
     name = models.CharField(max_length=250, unique=True)
-    description = models.TextField(blank=True, null=True) # Описание категории (необязательно)
+    description = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -42,6 +43,13 @@ class Holiday(models.Model):
 
 
 class Service(models.Model):
+    
+    STATUS_CHOICES = [ # <--- Определяем варианты статусов модерации
+        ('pending', 'На модерации'),
+        ('approved', 'Одобрено'),
+        ('rejected', 'Отклонено'),
+    ]
+
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     images = models.ImageField(upload_to='images/', null=True, blank=True)
     title = models.CharField(max_length=250)
@@ -56,6 +64,9 @@ class Service(models.Model):
     isAvaliable = models.BooleanField(default=True)
     quantity = models.PositiveIntegerField(default=1)
     execution_time_days = models.PositiveIntegerField(default=1, help_text="Время выполнения услуги в рабочих днях") 
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    moderated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='moderated_services') 
+    moderated_at = models.DateTimeField(null=True, blank=True) 
     
     def __str__(self):
         return self.title

@@ -21,4 +21,6 @@ urlpatterns = [
     path('cart/clear/', views.clear_cart, name='clear_cart'), # Очистка корзины
     path('cart/checkout/', views.checkout_view, name='checkout'), # URL для оформления заказа
     path('seller/<int:seller_id>/', views.seller_detail_view, name='seller_detail'), # страница продавца
+    path('service/approve_from_index/<int:service_id>/', views.approve_service_from_index_view, name='approve_service_from_index'), # URL для одобрения с главной
+    path('service/reject_from_index/<int:service_id>/', views.reject_service_from_index_view, name='reject_service_from_index'), # URL для отклонения с главной
 ]

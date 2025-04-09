@@ -20,35 +20,48 @@ def seller_detail_view(request, seller_id):
     return render(request, 'main/seller_detail.html', context)
 
 
+@staff_member_required 
+def approve_service_from_index_view(request, service_id):
+    service = get_object_or_404(Service, pk=service_id)
+    service.status = 'approved'
+    service.moderated_by = request.user
+    service.moderated_at = datetime.datetime.now()
+    service.save()
+    return redirect('index')
 
-@login_required # Оформление заказа только для зарегистрированных пользователей
+@staff_member_required 
+def reject_service_from_index_view(request, service_id):
+    service = get_object_or_404(Service, pk=service_id)
+    service.status = 'rejected'
+    service.moderated_by = request.user
+    service.moderated_at = datetime.datetime.now()
+    service.save()
+    return redirect('index')
+
+
+@login_required 
 def checkout_view(request):
     cart = request.session.get('cart', {})
     cart_items = []
     total_price = 0
-    errors = [] # Список для хранения сообщений об ошибках
+    errors = [] 
 
     if not cart:
-        # Если корзина пуста изначально
+        
         return render(request, 'main/cart.html', {'cart_items': [], 'total_price': 0, 'errors': ['Ваша корзина пуста.']})
 
-    # Сначала соберем информацию и проверим наличие
-    for service_id, quantity in list(cart.items()): # Используем list(), чтобы можно было удалять элементы во время итерации
+    for service_id, quantity in list(cart.items()): 
         try:
-            service = Service.objects.get(pk=service_id) # Используем get вместо get_object_or_404 для ручной обработки
+            service = Service.objects.get(pk=service_id)
             if not service.isAvaliable:
                  errors.append(f"Услуга '{service.title}' больше недоступна.")
-                 del cart[service_id] # Удаляем из корзины, если недоступна
-                 continue # Переходим к следующему товару
+                 del cart[service_id] 
+                 continue
 
             if service.quantity < quantity:
                 errors.append(f"Недостаточное количество для услуги '{service.title}'. Доступно: {service.quantity}, запрошено: {quantity}.")
-                # Опционально: можно уменьшить количество в корзине до доступного
-                # cart[service_id] = service.quantity
-                # quantity = service.quantity
-                # Или просто удалить, если не хотим продавать меньше
                 del cart[service_id]
-                continue # Переходим к следующему товару
+                continue 
 
             item_total_price = service.price * quantity
             cart_items.append({
@@ -60,71 +73,55 @@ def checkout_view(request):
 
         except Service.DoesNotExist:
              errors.append(f"Услуга с ID {service_id} не найдена.")
-             del cart[service_id] # Удаляем из корзины, если не найдена
+             del cart[service_id]
 
-    # Обновляем сессию с возможными изменениями в корзине
     request.session['cart'] = cart
 
-    # Если после проверок корзина опустела или были ошибки и нет POST-запроса
     if not cart_items and request.method != 'POST':
-         # Перенаправляем обратно в корзину с сообщениями об ошибках
-         # Сохраняем ошибки в сессии или передаем их в контекст шаблона корзины
-         # Пример сохранения в сессии (потребуется отобразить их в шаблоне cart.html):
          request.session['cart_errors'] = errors
-         return redirect('view_cart') # Или рендерим checkout.html с ошибками
+         return redirect('view_cart') 
 
     if request.method == 'POST':
-        # Если были ошибки на этапе проверки, не позволяем оформить заказ
         if errors:
              context = {
-                 'cart_items': cart_items, # Показываем то, что осталось
+                 'cart_items': cart_items,
                  'total_price': total_price,
-                 'errors': errors, # Показываем ошибки
+                 'errors': errors, 
              }
              return render(request, 'main/checkout.html', context)
 
-        # Ошибок нет, создаем заказы
         for item in cart_items:
             service = item['service']
             quantity = item['quantity']
 
-            # ---- ВАЖНО: Повторная проверка на всякий случай (параллельные запросы) ----
-            service.refresh_from_db() # Обновляем данные из БД
+            service.refresh_from_db() 
             if service.quantity < quantity or not service.isAvaliable:
-                 # Обработка редкого случая, когда товар закончился между проверкой и POST-запросом
                  request.session['cart_errors'] = [f"К сожалению, количество товара '{service.title}' изменилось. Пожалуйста, проверьте корзину."]
-                 # Очищаем только этот товар из сессии корзины
                  current_cart = request.session.get('cart', {})
                  if str(service.id) in current_cart:
                      del current_cart[str(service.id)]
                      request.session['cart'] = current_cart
                  return redirect('view_cart')
-            # ---- Конец повторной проверки ----
 
             order = Order.objects.create(
                 user=request.user,
                 service=service,
                 quantity=quantity,
                 total_price=item['total_price']
-                # Расчет estimated_completion_date можно добавить и сюда, если нужно
             )
             service.quantity -= quantity
             if service.quantity == 0:
                 service.isAvaliable = False
             service.save() # Теперь эта строка безопасна
 
-        # Очистка корзины после успешного оформления заказа
-        # del request.session['cart'] # Перенесено выше, т.к. корзина могла измениться
 
         return render(request, 'main/checkout_success.html', {'total_price': total_price})
 
-    # Если метод GET и есть товары (прошли проверку или не было ошибок)
     context = {
         'cart_items': cart_items,
         'total_price': total_price,
-        'errors': errors, # Передаем ошибки, если они были на этапе GET
+        'errors': errors,
     }
-    # Отображаем страницу подтверждения заказа
     return render(request, 'main/checkout.html', context)
 
 @login_required
@@ -142,7 +139,6 @@ def order_service_view(request, service_id):
                     service.isAvaliable = False
                 service.save()
 
-                # Расчет даты выполнения
                 holidays = Holiday.objects.all()
                 start_date = order.created_at
                 estimated_completion_date = calculate_estimated_completion_date(start_date, service.execution_time_days, holidays)
@@ -183,7 +179,7 @@ def calculate_estimated_completion_date(start_date, execution_time_days, holiday
     return current_date.date()
 
 def index(request):
-    services = Service.objects.filter(isAvaliable=True).select_related('category')
+    services = Service.objects.filter(isAvaliable=True, status='approved').select_related('category') 
     categories = Category.objects.all()
     max_price = Service.objects.filter(isAvaliable=True).order_by('-price').first()
     if max_price:
@@ -217,14 +213,21 @@ def index(request):
     if price_to:
         services = services.filter(price__lte=price_to)
 
+
+    pending_services = None 
+    if request.user.is_staff or request.user.is_superuser: 
+        pending_services = Service.objects.filter(status='pending').select_related('category')
+
     context = {
         'services': services,
         'categories': categories,
         'max_price': max_price,
         'price_from_value': price_from or 0,
         'price_to_value': price_to or max_price,
+        'pending_services': pending_services, 
     }
     return render(request, 'main/index.html', context)
+
 
 def service_detail(request, service_id):
     service = get_object_or_404(Service, pk=service_id)
@@ -326,6 +329,7 @@ def add_service_view(request):
         if form.is_valid():
             service = form.save(commit=False)
             service.user = request.user
+            service.status = 'pending' 
             service.save()
             return redirect('service_detail', service_id=service.id)
     else:
@@ -529,3 +533,8 @@ def checkout_view(request):
         'errors': errors,
     }
     return render(request, 'main/checkout.html', context)
+
+
+
+
+
