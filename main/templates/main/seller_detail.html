@@ -1,0 +1,59 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Страница продавца: {{ seller.username }}{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h2 class="display-4">Информация о продавце: {{ seller.username }}</h2>
+
+        <div class="row">
+            <div class="col-md-3">
+                {% if seller.pfp %}
+                    <div class="d-flex justify-content-center">
+                        <img src="{{ seller.pfp.url }}" alt="Нет фотографии" >
+                    </div>
+                {% endif %}
+            </div>
+            <div class="col-md-9">
+                {% if seller.first_name or seller.last_name %}
+                    <p class="lead">Имя: {{ seller.first_name }} {{ seller.last_name }}</p>
+                {% endif %}
+                {% if seller.email %}
+                    <p class="lead">Email: <a href="mailto:{{ seller.email }}">{{ seller.email }}</a></p>
+                {% endif %}
+                {% if seller.phone %}
+                    <p class="lead">Телефон: {{ seller.phone }}</p>
+                {% endif %}
+                <p class="lead">Дата регистрации: {{ seller.dateregister|date:"d.m.Y H:i" }}</p>
+            </div>
+        </div>
+
+        <hr>
+
+        <h3 class="display-6">Услуги продавца:</h3>
+        {% if services %}
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                {% for service in services %}
+                    <div class="col">
+                        <div class="card">
+                            <a href="{% url 'service_detail' service.id %}">
+                                {% if service.images %}
+                                    <img src="{{ service.images.url }}" class="card-img-top" alt="{{ service.title }}">
+                                {% endif %}
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ service.title }}</h5>
+                                    <p class="card-text">Цена: {{ service.price }}</p>
+                                    <p class="card-text">Категория: {% if service.category %} {{ service.category.name }} {% else %} Нет категории {% endif %}</p>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="lead">У продавца пока нет доступных услуг.</p>
+        {% endif %}
+
+        <a href="/" class="btn btn-primary">Вернуться на главную страницу</a>
+    </div>
+{% endblock %}

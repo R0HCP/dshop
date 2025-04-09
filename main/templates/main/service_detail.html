@@ -33,30 +33,32 @@
                 <div class="card-header">
                     Информация о продавце
                 </div>
-                <div class="card-body">
-                    <div class="d-flex align-items-center mb-3">
-                        {% if service.user.pfp %}
-                            <img src="{{ service.user.pfp.url }}" alt="Фото {{ service.user.username }}" class="img-thumbnail rounded-circle me-3" style="width: 60px; height: 60px; object-fit: cover;">
-                        {% else %}
-                            <i class="bi bi-person-circle fs-1 me-3 text-body-secondary"></i>
-                        {% endif %}
-                        <div>
-                            <h5 class="card-title mb-0">{{ service.user.username }}</h5>
-                            {% if service.user.isTrusted %}
-                                <span class="badge bg-success"><i class="bi bi-patch-check-fill me-1"></i>Проверенный</span>
+                <a href="{% url 'seller_detail' service.user.id %}">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            {% if service.user.pfp %}
+                                <img src="{{ service.user.pfp.url }}" alt="Фото {{ service.user.username }}" class="img-thumbnail rounded-circle me-3" style="width: 60px; height: 60px; object-fit: cover;">
+                            {% else %}
+                                <i class="bi bi-person-circle fs-1 me-3 text-body-secondary"></i>
                             {% endif %}
+                            <div>
+                                <h5 class="card-title mb-0">{{ service.user.username }}</h5>
+                                {% if service.user.isTrusted %}
+                                    <span class="badge bg-success"><i class="bi bi-patch-check-fill me-1"></i>Проверенный</span>
+                                {% endif %}
+                            </div>
                         </div>
+                        {% if service.user.first_name or service.user.last_name %}
+                            <p class="card-text mb-1"><strong>Имя:</strong> {{ service.user.get_full_name }}</p>
+                        {% endif %}
+                        {% if service.user.email %}
+                            <p class="card-text mb-1"><strong>Email:</strong> <a href="mailto:{{ service.user.email }}">{{ service.user.email }}</a></p>
+                        {% endif %}
+                        {% if service.user.phone %}
+                            <p class="card-text mb-1"><strong>Телефон:</strong> {{ service.user.phone }}</p>
+                        {% endif %}
                     </div>
-                    {% if service.user.first_name or service.user.last_name %}
-                        <p class="card-text mb-1"><strong>Имя:</strong> {{ service.user.get_full_name }}</p>
-                    {% endif %}
-                    {% if service.user.email %}
-                        <p class="card-text mb-1"><strong>Email:</strong> <a href="mailto:{{ service.user.email }}">{{ service.user.email }}</a></p>
-                    {% endif %}
-                    {% if service.user.phone %}
-                        <p class="card-text mb-1"><strong>Телефон:</strong> {{ service.user.phone }}</p>
-                    {% endif %}
-                </div>
+                </a>
             </div>
 
             <div class="card shadow-sm">

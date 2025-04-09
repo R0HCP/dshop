@@ -9,6 +9,18 @@ from .forms import UserProfileEditForm
 from django.http import HttpResponse, HttpResponseForbidden, JsonResponse 
 import datetime
 
+def seller_detail_view(request, seller_id):
+    seller = get_object_or_404(User, pk=seller_id)
+    services = Service.objects.filter(user=seller, isAvaliable=True) # Получаем доступные услуги продавца
+
+    context = {
+        'seller': seller,
+        'services': services,
+    }
+    return render(request, 'main/seller_detail.html', context)
+
+
+
 @login_required # Оформление заказа только для зарегистрированных пользователей
 def checkout_view(request):
     cart = request.session.get('cart', {})

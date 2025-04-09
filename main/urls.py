@@ -20,4 +20,5 @@ urlpatterns = [
     path('cart/update/<int:service_id>/', views.update_cart_quantity, name='update_cart_quantity'), # Обновление количества
     path('cart/clear/', views.clear_cart, name='clear_cart'), # Очистка корзины
     path('cart/checkout/', views.checkout_view, name='checkout'), # URL для оформления заказа
+    path('seller/<int:seller_id>/', views.seller_detail_view, name='seller_detail'), # страница продавца
 ]

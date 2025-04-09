@@ -89,9 +89,9 @@
                         <h5 class="card-title">{{ service.title }}</h5>
                         <p class="card-text flex-grow-1">{{ service.description|truncatewords:20 }}</p> 
                         <p>Категория: {% if service.category %} {{ service.category.name }} {% else %} Нет категории {% endif %}</p> 
-                        <p class="card-text fs-5 fw-bold">{{ service.price }} руб.</p> 
+                        <p class="card-text fs-5 fw-bold">{{ service.price }} руб.</p>
                         <p class="card-text"><small class="text-body-secondary"> 
-                            Продавец: {{ service.user.username }}
+                            <a href="{% url 'seller_detail' service.user.id %}">Продавец:</a> {{ service.user.username }}
                             {% if service.user.isTrusted %}
                                 <i class="bi bi-patch-check-fill text-primary ms-1" title="Проверенный продавец"></i>
                             {% endif %}
