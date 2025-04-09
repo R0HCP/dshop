@@ -25,6 +25,12 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.username
 
+class Category(models.Model): # <--- Новая модель Category
+    name = models.CharField(max_length=250, unique=True)
+    description = models.TextField(blank=True, null=True) # Описание категории (необязательно)
+
+    def __str__(self):
+        return self.name
 
 class Holiday(models.Model):
     date = models.DateField(unique=True)
@@ -40,6 +46,12 @@ class Service(models.Model):
     images = models.ImageField(upload_to='images/', null=True, blank=True)
     title = models.CharField(max_length=250)
     description = models.TextField()
+    category = models.ForeignKey( 
+    Category,
+        on_delete=models.SET_NULL, 
+        null=True,
+        blank=True
+    )
     price = models.DecimalField(max_digits=10, decimal_places=2)
     isAvaliable = models.BooleanField(default=True)
     quantity = models.PositiveIntegerField(default=1)

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import User, Service, Order, Transaction, Holiday 
+from .models import User, Service, Order, Transaction, Holiday, Category 
 
 def toggle_is_trusted_action(modeladmin, request, queryset):
     for user in queryset:
@@ -17,13 +17,13 @@ class UserAdmin(admin.ModelAdmin):
     list_filter = ('isTrusted', 'is_staff', 'is_superuser') 
     actions = [toggle_is_trusted_action]
  
-
-class ServiceAdmin(admin.ModelAdmin): 
-    list_display = ('title', 'price', 'isAvaliable', 'execution_time_days') 
-    list_editable = ('isAvaliable', 'execution_time_days') #  прямо в списке
+class ServiceAdmin(admin.ModelAdmin):
+    list_display = ('title', 'price', 'isAvaliable', 'execution_time_days', 'category') 
+    list_editable = ('isAvaliable', 'execution_time_days', 'category') 
 
 admin.site.register(User, UserAdmin) # для админки
 admin.site.register(Service, ServiceAdmin) # да, и что теперь? 
 admin.site.register(Order)
 admin.site.register(Transaction)
 admin.site.register(Holiday) 
+admin.site.register(Category) 

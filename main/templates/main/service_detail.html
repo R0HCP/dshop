@@ -63,8 +63,8 @@
                 <div class="card-body">
                     <h5 class="card-title">Описание</h5>
                     <p class="card-text">{{ service.description|linebreaksbr }}</p>
-
-                    <p class="card-text fs-4 fw-bold my-3">{{ service.price }} руб.</p> {# Выделяем цену #}
+                    <p class="card-text">Категория: {{ service.category.name }}</p>
+                    <p class="card-text fs-4 fw-bold my-3">{{ service.price }} руб.</p>
 
                     {% if service.isAvaliable %}
                         <p class="card-text mb-3"><strong>В наличии:</strong> {{ service.quantity }}</p>

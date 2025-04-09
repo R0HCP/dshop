@@ -18,16 +18,16 @@ class CustomAuthenticationForm(AuthenticationForm):
 class AddServiceForm(forms.ModelForm):
     class Meta:
         model = Service
-        fields = ['images', 'title', 'description', 'price', 'quantity', 'execution_time_days'] 
-
-class OrderServiceForm(forms.Form):
-    quantity = forms.IntegerField(min_value=1, initial=1)
-
+        fields = ['category', 'images', 'title', 'description', 'price', 'quantity', 'execution_time_days'] 
 
 class EditServiceForm(forms.ModelForm):
     class Meta:
         model = Service
-        fields = ['images', 'title', 'description', 'price', 'isAvaliable', 'quantity', 'execution_time_days'] # <--- Добавлено execution_time_days
+        fields = ['category', 'images', 'title', 'description', 'price', 'isAvaliable', 'quantity', 'execution_time_days'] # <--- Добавлено execution_time_days
+
+class OrderServiceForm(forms.Form):
+    quantity = forms.IntegerField(min_value=1, initial=1)
+
 
 class UserProfileEditForm(forms.ModelForm):
     class Meta:
