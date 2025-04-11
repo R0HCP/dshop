@@ -91,4 +91,4 @@ class OrderServiceForm(forms.Form):
 class UserProfileEditForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ['email', 'phone', 'first_name', 'last_name', 'pfp'] 
+        fields = ['email', 'phone', 'first_name', 'last_name', 'pfp', 'office_latitude', 'office_longitude'] 

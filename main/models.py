@@ -33,6 +33,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     dateregister = models.DateTimeField(auto_now_add=True)
     isTrusted = models.BooleanField(default=True)
     pfp = models.ImageField(upload_to='pfp/', null=True, blank=True)
+    office_latitude = models.FloatField(null=True, blank=True, verbose_name="Широта офиса") 
+    office_longitude = models.FloatField(null=True, blank=True, verbose_name="Долгота офиса")
 
     USERNAME_FIELD = 'username' # 
     REQUIRED_FIELDS = [] 

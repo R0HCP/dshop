@@ -10,6 +10,7 @@ from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
 import datetime
 from .forms import ConsultationSlotForm
 from django.utils import timezone # Импортируем timezone
+from django.conf import settings 
 
 
 
@@ -99,9 +100,20 @@ def seller_detail_view(request, seller_id):
     seller = get_object_or_404(User, pk=seller_id)
     services = Service.objects.filter(user=seller, isAvaliable=True) # Получаем доступные услуги продавца
 
+    try:
+        lat_str = f"{seller.office_latitude:.9f}" if seller.office_latitude is not None else "null"
+        lon_str = f"{seller.office_longitude:.9f}" if seller.office_longitude is not None else "null"
+    except (ValueError, TypeError):
+        lat_str = "null"
+        lon_str = "null"
+        print(f"Warning: Could not format coordinates for seller {seller_id}") # Лог для отладки
+
     context = {
         'seller': seller,
         'services': services,
+        'yandex_maps_api_key': settings.YANDEX_MAPS_API_KEY,
+        'office_latitude_str': lat_str,
+        'office_longitude_str': lon_str,
     }
     return render(request, 'main/seller_detail.html', context)
 
@@ -318,11 +330,27 @@ def index(request):
 def service_detail(request, service_id):
     service = get_object_or_404(Service, pk=service_id)
     order_form = OrderServiceForm()
+    seller = service.user 
+
+    try:
+        lat_str = f"{seller.office_latitude:.9f}" if seller.office_latitude is not None else "null"
+        lon_str = f"{seller.office_longitude:.9f}" if seller.office_longitude is not None else "null"
+    except (ValueError, TypeError):
+        lat_str = "null"
+        lon_str = "null"
+        print(f"Warning: Could not format coordinates for user {seller.id} on service detail page {service_id}")
+
     context = {
         'service': service,
         'order_form': order_form,
+        'seller': seller, # Передаем продавца на всякий случай
+        'office_latitude_str': lat_str,
+        'office_longitude_str': lon_str,
+        'yandex_maps_api_key': settings.YANDEX_MAPS_API_KEY,
     }
     return render(request, 'main/service_detail.html', context)
+
+
 
 @staff_member_required
 def delete_service_view(request, service_id):
@@ -444,16 +472,24 @@ def edit_service_view(request, service_id):
 
 @login_required
 def profile_view(request):
+    try:
+        lat_str = f"{request.user.office_latitude:.9f}" if request.user.office_latitude is not None else "null"
+        lon_str = f"{request.user.office_longitude:.9f}" if request.user.office_longitude is not None else "null"
+    except (ValueError, TypeError):
+        lat_str = "null"
+        lon_str = "null"
+        print(f"Warning: Could not format coordinates for user {request.user.id}")
+
     if request.method == 'POST':
-        form = UserProfileEditForm(request.POST, request.FILES, instance=request.user)
-        if form.is_valid():
-            form.save()
-            return redirect('profile')
+        pass 
     else:
         form = UserProfileEditForm(instance=request.user)
 
     context = {
         'form': form,
+        'yandex_maps_api_key': settings.YANDEX_MAPS_API_KEY,
+        'office_latitude_str': lat_str,
+        'office_longitude_str': lon_str,
     }
     return render(request, 'main/profile.html', context)
 

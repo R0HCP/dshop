@@ -28,6 +28,57 @@
             </div>
         </div>
 
+       {% comment %} Проверяем, что обе координаты существуют и не пустые {% endcomment %}
+       {% if seller.office_latitude is not None and seller.office_longitude is not None %} {# Можно оставить проверку на None из модели #}
+       <div id="yandex_map" style="width: 100%; height: 400px;"></div>
+       <script src="https://api-maps.yandex.ru/2.1/?apikey={{ yandex_maps_api_key }}&lang=ru_RU" type="text/javascript"></script>
+       <script type="text/javascript">
+           ymaps.ready(init);
+       
+           function init() {
+               // Используем строки, отформатированные во view
+               var latStr = "{{ office_latitude_str }}";
+               var lonStr = "{{ office_longitude_str }}";
+       
+               var lat = null;
+               var lon = null;
+       
+               // Парсим строки в JS
+               if (latStr !== 'null') {
+                   lat = parseFloat(latStr);
+               }
+               if (lonStr !== 'null') {
+                   lon = parseFloat(lonStr);
+               }
+       
+               if (lat !== null && !isNaN(lat) && lon !== null && !isNaN(lon)) {
+                   var myMap = new ymaps.Map("yandex_map", {
+                       center: [lat, lon],
+                       zoom: 14,
+                       controls: ['zoomControl', 'fullscreenControl']
+                   }, {
+                       searchControlProvider: 'yandex#search'
+                   });
+       
+                   var myPlacemark = new ymaps.Placemark([lat, lon], {
+                       balloonContentHeader: 'Офис {{ seller.username|escapejs }}',
+                       balloonContentBody: '{% if seller.first_name or seller.last_name %}{{ seller.get_full_name|escapejs }}{% else %}{{ seller.username|escapejs }}{% endif %}'
+                   });
+       
+                   myMap.geoObjects.add(myPlacemark);
+       
+               } else {
+                   console.error("Ошибка координат после получения из view:", latStr, lonStr);
+                   var mapContainer = document.getElementById("yandex_map");
+                   if (mapContainer) {
+                       mapContainer.innerHTML = '<p class="text-muted text-center p-5">Не удалось определить координаты офиса.</p>';
+                   }
+               }
+           }
+       </script>
+       {% else %}
+           <p>Местоположение офиса не указано.</p>
+       {% endif %}
         <hr>
 
         <h3 class="display-6">Услуги продавца:</h3>

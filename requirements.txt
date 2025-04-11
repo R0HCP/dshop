@@ -4,3 +4,4 @@ asgiref>=3.8.1
 sqlparse>=0.3.1
 tzdata 
 phonenumbers
+python-dotenv
