@@ -4,10 +4,96 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.admin.views.decorators import staff_member_required
 from .forms import CustomUserCreationForm, CustomAuthenticationForm, AddServiceForm, OrderServiceForm, EditServiceForm 
-from .models import Service, Order, Holiday, User, Category
+from .models import Service, Order, Holiday, User, Category, ConsultationSlot, ConsultationBooking
 from .forms import UserProfileEditForm
 from django.http import HttpResponse, HttpResponseForbidden, JsonResponse 
 import datetime
+from .forms import ConsultationSlotForm
+from django.utils import timezone # Импортируем timezone
+
+
+
+@login_required
+def client_profile_view(request, booking_id):
+    booking = get_object_or_404(ConsultationBooking, pk=booking_id, slot__seller=request.user) 
+    client = booking.client
+
+    context = {
+        'client': client,
+        'booking': booking, 
+    }
+    return render(request, 'main/client_profile.html', context)
+
+@login_required
+def seller_slots_view(request):
+    slots = ConsultationSlot.objects.filter(seller=request.user).order_by('start_time')
+    if request.method == 'POST':
+        form = ConsultationSlotForm(request.POST)
+        if form.is_valid():
+            days_of_week = form.cleaned_data['days_of_week']
+            start_time = form.cleaned_data['start_time']
+            end_time = form.cleaned_data['end_time']
+            duration_minutes = form.cleaned_data['duration_minutes']
+            break_start_time = form.cleaned_data['break_start_time']
+            break_end_time = form.cleaned_data['break_end_time']
+            start_date = form.cleaned_data['start_date']
+            end_date = form.cleaned_data['end_date'] or datetime.date.today() + datetime.timedelta(days=365)
+
+            current_date = start_date
+            while current_date <= end_date:
+                if str(current_date.weekday()) in days_of_week:
+                    current_slot_start = datetime.datetime.combine(current_date, start_time, tzinfo=timezone.get_current_timezone()) 
+                    current_slot_end = datetime.datetime.combine(current_date, start_time, tzinfo=timezone.get_current_timezone()) 
+
+                    while current_slot_end.time() < end_time:
+                        current_slot_end += datetime.timedelta(minutes=duration_minutes)
+
+                        if break_start_time and break_end_time: 
+                            slot_break_start = datetime.datetime.combine(current_date, break_start_time, tzinfo=timezone.get_current_timezone()).time() 
+                            slot_break_end = datetime.datetime.combine(current_date, break_end_time, tzinfo=timezone.get_current_timezone()).time() 
+
+                            if not (slot_break_start <= current_slot_start.time() < slot_break_end or slot_break_start < current_slot_end.time() <= slot_break_end): 
+                                if current_slot_end.time() <= end_time:
+                                    ConsultationSlot.objects.create(
+                                        seller=request.user,
+                                        start_time=current_slot_start,
+                                        end_time=current_slot_end
+                                    )
+                        else: 
+                            if current_slot_end.time() <= end_time: 
+                                ConsultationSlot.objects.create(
+                                    seller=request.user,
+                                    start_time=current_slot_start,
+                                    end_time=current_slot_end
+                                )
+                        current_slot_start = current_slot_end # Сдвигаем время начала для следующего слота
+
+                current_date += datetime.timedelta(days=1) # Переходим к следующему дню
+
+            return redirect('seller_slots')
+    else:
+        form = ConsultationSlotForm()
+    return render(request, 'main/seller_slots.html', {'form': form, 'slots': slots})
+
+
+def service_consultation_view(request, service_id):
+    service = get_object_or_404(Service, pk=service_id) 
+    seller = service.user 
+    available_slots = ConsultationSlot.objects.filter(seller=seller, is_booked=False, start_time__gte=datetime.datetime.now()).order_by('start_time') # нет мы не будем смотреть в прошлое
+
+    if request.method == 'POST':
+        slot_id = request.POST.get('slot_id')
+        if slot_id:
+            slot = get_object_or_404(ConsultationSlot, pk=slot_id, is_booked=False, seller=seller)
+            ConsultationBooking.objects.create(slot=slot, client=request.user) 
+            slot.is_booked = True 
+            slot.save()
+            return render(request, 'main/consultation_success.html', {'slot': slot}) 
+        else:
+            return render(request, 'main/service_consultation.html', {'service': service, 'slots': available_slots, 'error': 'Выберите время консультации.'}) # Ошибка, если не выбран слот
+    return render(request, 'main/service_consultation.html', {'service': service, 'slots': available_slots})
+
+
 
 def seller_detail_view(request, seller_id):
     seller = get_object_or_404(User, pk=seller_id)
@@ -533,8 +619,3 @@ def checkout_view(request):
         'errors': errors,
     }
     return render(request, 'main/checkout.html', context)
-
-
-
-
-

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import User, Service, Order, Transaction, Holiday, Category 
+from .models import User, Service, Order, Transaction, Holiday, Category, ConsultationBooking, ConsultationSlot
 import datetime
 
 def toggle_is_trusted_action(modeladmin, request, queryset):
@@ -47,3 +47,5 @@ admin.site.register(Order)
 admin.site.register(Transaction)
 admin.site.register(Holiday) 
 admin.site.register(Category) 
+admin.site.register(ConsultationSlot) 
+admin.site.register(ConsultationBooking) 

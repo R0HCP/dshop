@@ -1,6 +1,25 @@
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
-from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, UserManager # <--- Импортируем AbstractBaseUser, PermissionsMixin и UserManager
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, UserManager
+from django.conf import settings
+
+
+class ConsultationSlot(models.Model):
+    seller = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='consultation_slots') # Используем settings.AUTH_USER_MODEL
+    start_time = models.DateTimeField()
+    end_time = models.DateTimeField()
+    is_booked = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Слот для {self.seller.username} с {self.start_time.strftime('%d.%m.%Y %H:%M')} по {self.end_time.strftime('%d.%m.%Y %H:%M')}"
+
+class ConsultationBooking(models.Model):
+    slot = models.ForeignKey(ConsultationSlot, on_delete=models.CASCADE, related_name='bookings')
+    client = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='consultation_bookings') # Используем settings.AUTH_USER_MODEL
+    booking_time = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Бронирование слота {self.slot.id} клиентом {self.client.username}"
 
 class User(AbstractBaseUser, PermissionsMixin): 
 
@@ -71,7 +90,7 @@ class Service(models.Model):
     def __str__(self):
         return self.title
     
-class Order(models.Model):
+class Order(models.Model):  
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     service = models.ForeignKey(Service, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)

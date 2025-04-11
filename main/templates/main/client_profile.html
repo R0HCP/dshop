@@ -1,0 +1,26 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Профиль клиента: {{ client.username }}{% endblock %}
+
+{% block content %}
+    <h2>Профиль клиента: {{ client.username }}</h2>
+
+    {% if client.pfp %}
+        <img src="{{ client.pfp.url }}" alt="Фото профиля клиента" style="width: 100px; height: 100px; border-radius: 50%;">
+    {% endif %}
+
+    {% if client.first_name or client.last_name %}
+        <p>Имя: {{ client.first_name }} {{ client.last_name }}</p>
+    {% endif %}
+    {% if client.email %}
+        <p>Email: <a href="mailto:{{ client.email }}">{{ client.email }}</a></p>
+    {% endif %}
+    {% if client.phone %}
+        <p>Телефон: {{ client.phone }}</p>
+    {% endif %}
+    <p>Дата регистрации: {{ client.dateregister|date:"d.m.Y H:i" }}</p>
+
+    <hr>
+
+    <a href="{% url 'seller_slots' %}">Вернуться к слотам консультаций</a>
+{% endblock %}

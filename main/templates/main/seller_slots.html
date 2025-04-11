@@ -1,0 +1,46 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Управление слотами консультаций{% endblock %}
+
+{% block content %}
+    <h2>Управление слотами консультаций</h2>
+
+    <h3>Добавить новые слоты</h3>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Добавить слоты</button>
+    </form>
+
+    <h3>Ваши слоты консультаций</h3>
+    {% if slots %}
+        <ul>
+            {% for slot in slots %}
+                <li>
+                    {{ slot }}
+                    {% if slot.is_booked %}
+                        <span style="color: red;">(Забронирован)</span>
+                        {% if slot.bookings.first.client %} {# Проверяем, что бронирование и клиент существуют #}
+                            <p>Клиент:
+                                <a href="{% url 'client_profile' slot.bookings.first.id %}">
+                                    {{ slot.bookings.first.client.username }}
+                                </a>
+                                {% if slot.bookings.first.client.first_name or slot.bookings.first.client.last_name %}
+                                    ({{ slot.bookings.first.client.first_name }} {{ slot.bookings.first.client.last_name }})
+                                {% endif %}
+                            </p>
+                            {% if slot.bookings.first.client.phone %}
+                                <p>Телефон: {{ slot.bookings.first.client.phone }}</p>
+                            {% endif %}
+                        {% endif %}
+                    {% else %}
+                        <span style="color: green;">(Доступен)</span>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>У вас пока нет слотов консультаций.</p>
+    {% endif %}
+
+{% endblock %}

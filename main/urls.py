@@ -23,4 +23,7 @@ urlpatterns = [
     path('seller/<int:seller_id>/', views.seller_detail_view, name='seller_detail'), # страница продавца
     path('service/approve_from_index/<int:service_id>/', views.approve_service_from_index_view, name='approve_service_from_index'), # URL для одобрения с главной
     path('service/reject_from_index/<int:service_id>/', views.reject_service_from_index_view, name='reject_service_from_index'), # URL для отклонения с главной
+    path('seller/slots/', views.seller_slots_view, name='seller_slots'), # Страница продавца для управления слотами
+    path('service/<int:service_id>/consultation/', views.service_consultation_view, name='service_consultation'), # Страница консультации для услуги
+    path('booking/<int:booking_id>/client_profile/', views.client_profile_view, name='client_profile'), # Страница профиля клиента
 ]

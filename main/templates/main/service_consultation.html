@@ -1,0 +1,34 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Запись на консультацию для "{{ service.title }}"{% endblock %}
+
+{% block content %}
+    <h2>Запись на консультацию для "{{ service.title }}"</h2>
+    <p>Продавец: {{ service.user.username }}</p>
+
+    {% if error %}
+        <p style="color: red;">{{ error }}</p>
+    {% endif %}
+
+    <h3>Доступные слоты:</h3>
+    {% if slots %}
+        <form method="post">
+            {% csrf_token %}
+            <ul>
+                {% for slot in slots %}
+                    <li>
+                        <label>
+                            <input type="radio" name="slot_id" value="{{ slot.id }}">
+                            {{ slot }}
+                        </label>
+                    </li>
+                {% endfor %}
+            </ul>
+            <button type="submit">Записаться на консультацию</button>
+        </form>
+    {% else %}
+        <p> нет доступных слотов для консультаций.</p>
+    {% endif %}
+
+    <a href="{% url 'service_detail' service.id %}">Вернуться к услуге</a>
+{% endblock %}
