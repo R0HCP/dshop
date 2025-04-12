@@ -480,8 +480,13 @@ def profile_view(request):
         lon_str = "null"
         print(f"Warning: Could not format coordinates for user {request.user.id}")
 
+
+
     if request.method == 'POST':
-        pass 
+        form = UserProfileEditForm(request.POST, request.FILES, instance=request.user)
+        if form.is_valid():
+            form.save()
+            return redirect('profile')
     else:
         form = UserProfileEditForm(instance=request.user)
 
