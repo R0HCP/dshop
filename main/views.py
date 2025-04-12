@@ -67,7 +67,7 @@ def seller_slots_view(request):
                                     start_time=current_slot_start,
                                     end_time=current_slot_end
                                 )
-                        current_slot_start = current_slot_end=
+                        current_slot_start = current_slot_end 
 
                 current_date += datetime.timedelta(days=1) 
 
