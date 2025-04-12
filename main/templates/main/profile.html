@@ -40,41 +40,78 @@
         <script src="https://api-maps.yandex.ru/2.1/?apikey={{ yandex_maps_api_key }}&lang=ru_RU" type="text/javascript"></script>
         <script type="text/javascript">
             ymaps.ready(init);
-    
+        
             function init() {
                 var latitudeInput = document.getElementById('office_latitude');
                 var longitudeInput = document.getElementById('office_longitude');
-    
-                var initialLatitude = parseFloat(latitudeInput.value) || 53.9; 
-                var initialLongitude = parseFloat(longitudeInput.value) || 27.5667;
-    
+        
+                // --- НАЧАЛО ИЗМЕНЕНИЙ ---
+                // Используем строки, отформатированные во view (как в seller_detail)
+                var initialLatStr = "{{ office_latitude_str }}";
+                var initialLonStr = "{{ office_longitude_str }}";
+        
+                var initialLatitude = null;
+                var initialLongitude = null;
+                var defaultLatitude = 53.9; // Минск по умолчанию, если координат нет
+                var defaultLongitude = 27.5667;
+        
+                if (initialLatStr !== 'null') {
+                    initialLatitude = parseFloat(initialLatStr);
+                }
+                if (initialLonStr !== 'null') {
+                    initialLongitude = parseFloat(initialLonStr);
+                }
+        
+                // Проверяем, удалось ли распарсить, иначе используем дефолтные значения
+                if (initialLatitude === null || isNaN(initialLatitude) || initialLongitude === null || isNaN(initialLongitude)) {
+                    console.warn("Не удалось получить начальные координаты из view, используются значения по умолчанию.");
+                    initialLatitude = defaultLatitude;
+                    initialLongitude = defaultLongitude;
+                    // Опционально: можно очистить value у input'ов, если они были некорректны
+                    // latitudeInput.value = '';
+                    // longitudeInput.value = '';
+                }
+        
+                console.log("Используемая начальная широта:", initialLatitude);
+                console.log("Используемая начальная долгота:", initialLongitude);
+                // --- КОНЕЦ ИЗМЕНЕНИЙ ---
+        
                 var myMap = new ymaps.Map('profile_yandex_map', {
+                    // Используем полученные и проверенные значения
                     center: [initialLatitude, initialLongitude],
-                    zoom: 10,
+                    zoom: 10, // Вы можете изменить зум по умолчанию, если нужно
                     controls: ['zoomControl', 'fullscreenControl']
                 }, {
                     searchControlProvider: 'yandex#search'
                 });
-    
-                var placemark = new ymaps.Placemark([initialLatitude, initialLongitude], {
-                    hintContent: 'Перетащите метку, чтобы указать местоположение вашего офиса'
-                }, {
-                    draggable: true
-                });
-    
+        
+                var placemark = new ymaps.Placemark(
+                    // Используем те же начальные координаты для метки
+                    [initialLatitude, initialLongitude],
+                    {
+                        hintContent: 'Перетащите метку, чтобы указать местоположение вашего офиса'
+                    },
+                    {
+                        draggable: true
+                    }
+                );
+        
                 myMap.geoObjects.add(placemark);
-    
-                placemark.events.add("dragend", function(e) {
+        
+                // Обработчики событий остаются без изменений (они используют toFixed(9))
+                placemark.events.add("dragend", function (e) {
                     var coords = placemark.geometry.getCoordinates();
-                    latitudeInput.value = coords[0].toFixed(9); // шесть знаков это скам
+                    latitudeInput.value = coords[0].toFixed(9);
                     longitudeInput.value = coords[1].toFixed(9);
+                    console.log("DragEnd Coords:", coords[0].toFixed(9), coords[1].toFixed(9)); // Для отладки
                 });
-    
+        
                 myMap.events.add('click', function (e) {
                     var coords = e.get('coords');
                     placemark.geometry.setCoordinates(coords);
                     latitudeInput.value = coords[0].toFixed(9);
                     longitudeInput.value = coords[1].toFixed(9);
+                    console.log("Click Coords:", coords[0].toFixed(9), coords[1].toFixed(9)); // Для отладки
                 });
             }
         </script>

@@ -67,9 +67,9 @@ def seller_slots_view(request):
                                     start_time=current_slot_start,
                                     end_time=current_slot_end
                                 )
-                        current_slot_start = current_slot_end # Сдвигаем время начала для следующего слота
+                        current_slot_start = current_slot_end=
 
-                current_date += datetime.timedelta(days=1) # Переходим к следующему дню
+                current_date += datetime.timedelta(days=1) 
 
             return redirect('seller_slots')
     else:
@@ -98,7 +98,7 @@ def service_consultation_view(request, service_id):
 
 def seller_detail_view(request, seller_id):
     seller = get_object_or_404(User, pk=seller_id)
-    services = Service.objects.filter(user=seller, isAvaliable=True) # Получаем доступные услуги продавца
+    services = Service.objects.filter(user=seller, isAvaliable=True) 
 
     try:
         lat_str = f"{seller.office_latitude:.9f}" if seller.office_latitude is not None else "null"
@@ -106,7 +106,7 @@ def seller_detail_view(request, seller_id):
     except (ValueError, TypeError):
         lat_str = "null"
         lon_str = "null"
-        print(f"Warning: Could not format coordinates for seller {seller_id}") # Лог для отладки
+        print(f"Warning: Could not format coordinates for seller {seller_id}") #
 
     context = {
         'seller': seller,
