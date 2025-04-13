@@ -17,12 +17,12 @@ class UserAdmin(admin.ModelAdmin):
     list_display = ('username', 'email', 'isTrusted', 'is_staff', 'is_superuser', 'office_latitude', 'office_longitude') # <--- Добавлены office_latitude и office_longitude в list_display
     list_filter = ('isTrusted', 'is_staff', 'is_superuser')
     actions = [toggle_is_trusted_action]
-    fieldsets = ( # <--- Добавляем в fieldsets для удобства редактирования в админке
+    fieldsets = (
         (None, {'fields': ('username', 'password')}),
         ('Персональная информация', {'fields': ('first_name', 'last_name', 'email', 'phone', 'pfp')}),
-        ('Геолокация офиса', {'fields': ('office_latitude', 'office_longitude')}), # <--- Новый fieldset для геолокации
+        ('Геолокация офиса', {'fields': ('office_latitude', 'office_longitude')}),
         ('Права доступа', {'fields': ('is_staff', 'is_superuser', 'is_active', 'groups', 'user_permissions', 'isTrusted')}),
-        ('Важные даты', {'fields': ('last_login', 'dateregister')}),
+        # ('Важные даты', {'fields': ('last_login', 'dateregister')}),
     )
  
 def approve_services(modeladmin, request, queryset):
