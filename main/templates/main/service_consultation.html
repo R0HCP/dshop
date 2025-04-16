@@ -7,28 +7,28 @@
     <p>Продавец: {{ service.user.username }}</p>
 
     {% if error %}
-        <p style="color: red;">{{ error }}</p>
+        <div class="alert alert-danger" role="alert">
+            {{ error }}
+        </div>
     {% endif %}
 
     <h3>Доступные слоты:</h3>
     {% if slots %}
         <form method="post">
             {% csrf_token %}
-            <ul>
+            <div class="form-check">
                 {% for slot in slots %}
-                    <li>
-                        <label>
-                            <input type="radio" name="slot_id" value="{{ slot.id }}">
-                            {{ slot }}
-                        </label>
-                    </li>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="slot_id" value="{{ slot.id }}" id="slot-{{ slot.id }}">
+                        <label class="form-check-label" for="slot-{{ slot.id }}">{{ slot }}</label>
+                    </div>
                 {% endfor %}
-            </ul>
-            <button type="submit">Записаться на консультацию</button>
+            </div>
+            <button type="submit" class="btn btn-primary">Записаться на консультацию</button>
         </form>
     {% else %}
-        <p> нет доступных слотов для консультаций.</p>
+        <p class="lead"> нет доступных слотов для консультаций.</p>
     {% endif %}
 
-    <a href="{% url 'service_detail' service.id %}">Вернуться к услуге</a>
+    <a href="{% url 'service_detail' service.id %}" class="btn btn-secondary">Вернуться к услуге</a>
 {% endblock %}

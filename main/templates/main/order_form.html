@@ -3,11 +3,15 @@
 {% block title %}Заказ услуги "{{ service.title }}"{% endblock %}
 
 {% block content %}
-    <h2>Заказ услуги "{{ service.title }}"</h2>
-    <p>Цена за единицу: {{ service.price }}</p>
-    <form method="post" class="some-form">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="major-button">Заказать</button>
-    </form>
+    <div class="container">
+        <h2 class="mt-4">Заказ услуги "{{ service.title }}"</h2>
+        <p>Цена за единицу: {{ service.price }}</p>
+        <form method="post" class="some-form">
+            {% csrf_token %}
+            <div class="mb-3">
+                {{ form.as_p }}
+            </div>
+            <button type="submit" class="btn btn-primary">Заказать</button>
+        </form>
+    </div>
 {% endblock %}

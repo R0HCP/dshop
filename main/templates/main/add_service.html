@@ -3,10 +3,10 @@
 {% block title %}Добавить услугу{% endblock %}
 
 {% block content %}
-    <h2>Добавление услуги</h2>
-    <form method="post" enctype="multipart/form-data" class="some-form"> 
+    <h2 class="text-center">Добавление услуги</h2>
+    <form method="post" enctype="multipart/form-data" class="needs-validation">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit" class="major-button">Добавить услугу</button>
+        <button type="submit" class="btn btn-primary">Добавить услугу</button>
     </form>
 {% endblock %}

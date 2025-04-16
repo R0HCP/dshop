@@ -4,10 +4,43 @@
 
 {% block content %}
     <h2>Вход</h2>
-    <form method="post" class="some-form">
+    <form method="post" class="needs-validation" novalidate>
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="major-button">Войти</button>
+        <div class="form-group">
+            <label for="username">Имя пользователя</label>
+            <input type="text" class="form-control" id="username" placeholder="Введите имя пользователя" name="username" required>
+            <div class="invalid-feedback">
+                Пожалуйста, введите имя пользователя.
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="password">Пароль</label>
+            <input type="password" class="form-control" id="password" placeholder="Введите пароль" name="password" required>
+            <div class="invalid-feedback">
+                Пожалуйста, введите пароль.
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Войти</button>
     </form>
     <p>Нет аккаунта? <a href="{% url 'register' %}">Зарегистрироваться</a></p>
+    <script>
+        // Example starter JavaScript for disabling form submissions if there are invalid fields
+        (function() {
+            'use strict';
+            window.addEventListener('load', function() {
+                // Fetch all the forms we want to apply custom Bootstrap validation styles to
+                var forms = document.getElementsByClassName('needs-validation');
+                // Loop through the forms and prevent submission
+                var validation = Array.prototype.filter.call(forms, function(form) {
+                    form.addEventListener('submit', function(event) {
+                        if (form.checkValidity() === false) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+            }, false);
+        })();
+    </script>
 {% endblock %}

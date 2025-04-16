@@ -3,26 +3,34 @@
 {% block title %}Заказ успешно оформлен{% endblock %}
 
 {% block content %}
-    <h2>Заказ успешно оформлен!</h2>
-    <p>Номер вашего заказа: {{ order_id }}</p>
-    <p>Спасибо за ваш заказ!</p>
+    <div class="alert alert-success" role="alert">
+        <h2 class="alert-heading">Заказ успешно оформлен!</h2>
+        <p>Номер вашего заказа: {{ order_id }}</p>
+        <p>Спасибо за ваш заказ!</p>
 
-    {% if completion_date %}
-        <p>Ориентировочная дата выполнения заказа: <strong>{{ completion_date }}</strong></p>
-    {% endif %}
+        {% if completion_date %}
+            <p>Ориентировочная дата выполнения заказа: <strong>{{ completion_date }}</strong></p>
+        {% endif %}
+    </div>
 
-    <h3>Контактная информация продавца:</h3>
+    <h3 class="mt-4">Контактная информация продавца:</h3>
     {% if seller %}
-        <p>Имя пользователя: {{ seller.username }}</p>
-        {% if seller.email %}
-            <p>Email: <a href="mailto:{{ seller.email }}">{{ seller.email }}</a></p>
-        {% endif %}
-        {% if seller.phone %}
-            <p>Телефон: {{ seller.phone }}</p>
-        {% endif %}
+        <div class="row">
+            <div class="col-md-6">
+                <p>Имя пользователя: {{ seller.username }}</p>
+                {% if seller.email %}
+                    <p>Email: <a href="mailto:{{ seller.email }}">{{ seller.email }}</a></p>
+                {% endif %}
+            </div>
+            <div class="col-md-6">
+                {% if seller.phone %}
+                    <p>Телефон: {{ seller.phone }}</p>
+                {% endif %}
+            </div>
+        </div>
     {% else %}
         <p>Информация о продавце недоступна.</p>
     {% endif %}
 
-    <a href="/">Вернуться на главную страницу</a>
+    <a href="/" class="btn btn-primary">Вернуться на главную страницу</a>
 {% endblock %}

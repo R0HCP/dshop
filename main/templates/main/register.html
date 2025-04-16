@@ -4,10 +4,37 @@
 
 {% block content %}
     <h2>Регистрация</h2>
-    <form method="post" class="some-form">
+    <form method="post" class="needs-validation" novalidate>
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="major-button">Зарегистрироваться</button>
+        <div class="mb-3">
+            <label for="username" class="form-label">Имя пользователя</label>
+            <input type="text" class="form-control" id="username" name="username" required>
+            <div class="invalid-feedback">
+                Введите имя пользователя
+            </div>
+        </div>
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp" required>
+            <div class="invalid-feedback">
+                Введите email
+            </div>
+        </div>
+        <div class="mb-3">
+            <label for="password1" class="form-label">Пароль</label>
+            <input type="password" class="form-control" id="password1" name="password1" required>
+            <div class="invalid-feedback">
+                Введите пароль
+            </div>
+        </div>
+        <div class="mb-3">
+            <label for="password2" class="form-label">Повторите пароль</label>
+            <input type="password" class="form-control" id="password2" name="password2" required>
+            <div class="invalid-feedback">
+                Пароли не совпадают
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Зарегистрироваться</button>
     </form>
     <p>Уже есть аккаунт? <a href="{% url 'login' %}">Войти</a></p>
 {% endblock %}
