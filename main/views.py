@@ -12,6 +12,135 @@ from .forms import ConsultationSlotForm
 from django.utils import timezone # Импортируем timezone
 from django.conf import settings 
 from django.db import transaction # Импортируем transaction для атомарности
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.units import inch
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+from reportlab.lib import colors
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+import io
+
+@login_required
+def profile_view(request):
+    user_orders = Order.objects.filter(user=request.user).order_by('-created_at') # Получаем заказы пользователя
+    user_bookings = ConsultationBooking.objects.filter(client=request.user).select_related('slot').order_by('-booking_time') # Получаем бронирования пользователя
+
+    if request.method == 'POST':
+        form = UserProfileEditForm(request.POST, request.FILES, instance=request.user)
+        if form.is_valid():
+            user = form.save(commit=False)
+            latitude_str = request.POST.get('office_latitude')
+            longitude_str = request.POST.get('office_longitude')
+            user.office_latitude = float(latitude_str) if latitude_str else None
+            user.office_longitude = float(longitude_str) if longitude_str else None
+            user.save()
+            return redirect('profile')
+    else:
+        form = UserProfileEditForm(instance=request.user)
+
+    context = {
+        'form': form,
+        'user_orders': user_orders, # Передаем заказы в контекст
+        'user_bookings': user_bookings, # Передаем бронирования в контекст
+        'yandex_maps_api_key': settings.YANDEX_MAPS_API_KEY,
+    }
+    return render(request, 'main/profile.html', context)
+
+# --- Представление для генерации PDF отчета ---
+@login_required
+def download_purchase_report_pdf(request):
+    # Получаем заказы пользователя
+    user_orders = Order.objects.filter(user=request.user).order_by('-created_at').select_related('service')
+
+    # Создаем байтовый буфер для PDF
+    buffer = io.BytesIO()
+
+    # Создаем PDF документ
+    doc = SimpleDocTemplate(buffer, pagesize=letter)
+    styles = getSampleStyleSheet()
+
+    # --- Настройка шрифтов для кириллицы (важно!) ---
+    # Убедитесь, что у вас есть шрифт IBMPlexSerif-Regular.ttf или другой шрифт, поддерживающий кириллицу
+    # Скачать можно, например, с https://dejavu-fonts.github.io/
+    # Поместите файл шрифта в ваш проект (например, в папку static/fonts/)
+    try:
+        # Укажите правильный путь к вашему файлу шрифта
+        pdfmetrics.registerFont(TTFont('IBMPlexSerif-Regular', 'static/fonts/IBMPlexSerif-Regular.ttf'))
+        styles['Normal'].fontName = 'IBMPlexSerif-Regular'
+        styles['Heading1'].fontName = 'IBMPlexSerif-Regular'
+        styles['Heading2'].fontName = 'IBMPlexSerif-Regular'
+    except Exception as e:
+        print(f"Ошибка загрузки шрифта для PDF: {e}")
+        # Если шрифт не найден, кириллица может отображаться некорректно
+    # --------------------------------------------------
+
+    story = [] # Список элементов для PDF
+
+    # Заголовок
+    story.append(Paragraph(f"Отчет о покупках для {request.user.username}", styles['h1']))
+    story.append(Spacer(1, 0.2*inch))
+
+    # Данные для таблицы
+    data = [['Дата заказа', 'Услуга', 'Количество', 'Цена']]
+    total_spent = 0
+
+    for order in user_orders:
+        data.append([
+            order.created_at.strftime('%d.%m.%Y %H:%M'),
+            order.service.title,
+            str(order.quantity),
+            str(order.total_price)
+        ])
+        total_spent += order.total_price
+
+    # Создаем таблицу
+    table = Table(data)
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'IBMPlexSerif-Regular'), # Используем шрифт
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('FONTNAME', (0, 1), (-1, -1), 'IBMPlexSerif-Regular') # Используем шрифт для данных
+    ]))
+
+    story.append(table)
+    story.append(Spacer(1, 0.2*inch))
+
+    # Итоговая сумма
+    story.append(Paragraph(f"Итого потрачено: {total_spent}", styles['h2']))
+
+    # Собираем PDF
+    doc.build(story)
+
+    # Устанавливаем указатель буфера в начало
+    buffer.seek(0)
+
+    # Возвращаем PDF как ответ
+    response = HttpResponse(buffer, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="purchase_report_{request.user.username}.pdf"'
+    return response
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 @login_required
@@ -512,33 +641,6 @@ def edit_service_view(request, service_id):
     }
     return render(request, 'main/edit_service.html', context)
 
-@login_required
-def profile_view(request):
-    try:
-        lat_str = f"{request.user.office_latitude:.9f}" if request.user.office_latitude is not None else "null"
-        lon_str = f"{request.user.office_longitude:.9f}" if request.user.office_longitude is not None else "null"
-    except (ValueError, TypeError):
-        lat_str = "null"
-        lon_str = "null"
-        print(f"Warning: Could not format coordinates for user {request.user.id}")
-
-
-
-    if request.method == 'POST':
-        form = UserProfileEditForm(request.POST, request.FILES, instance=request.user)
-        if form.is_valid():
-            form.save()
-            return redirect('profile')
-    else:
-        form = UserProfileEditForm(instance=request.user)
-
-    context = {
-        'form': form,
-        'yandex_maps_api_key': settings.YANDEX_MAPS_API_KEY,
-        'office_latitude_str': lat_str,
-        'office_longitude_str': lon_str,
-    }
-    return render(request, 'main/profile.html', context)
 
 @login_required
 def toggle_trusted_view(request):

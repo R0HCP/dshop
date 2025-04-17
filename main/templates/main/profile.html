@@ -29,7 +29,42 @@
         {% csrf_token %}
         {{ form.as_p }}
 
-                    
+        <hr>
+
+        <h3>Мои заказы</h3>
+        {% if user_orders %}
+            <ul>
+                {% for order in user_orders %}
+                    <li>
+                        Заказ #{{ order.id }} от {{ order.created_at|date:"d.m.Y H:i" }}:
+                        <strong>{{ order.service.title }}</strong> (Кол-во: {{ order.quantity }}) - {{ order.total_price }} руб.
+                        {% if order.estimated_completion_date %}
+                            (Ожид. выполнение: {{ order.estimated_completion_date|date:"d.m.Y" }})
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+            <p><a href="{% url 'download_purchase_report' %}">Скачать отчет о покупках (PDF)</a></p>
+        {% else %}
+            <p>У вас пока нет заказов.</p>
+        {% endif %}
+    
+        <hr>
+    
+        <h3>Мои записи на консультации</h3>
+        {% if user_bookings %}
+            <ul>
+                {% for booking in user_bookings %}
+                    <li>
+                        Запись на {{ booking.slot.start_time|date:"d.m.Y H:i" }} - {{ booking.slot.end_time|date:"H:i" }}
+                        с <strong>{{ booking.slot.seller.username }}</strong>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>У вас пока нет записей на консультации.</p>
+        {% endif %}
+    
 
 
         <h3>Местоположение офиса</h3>
