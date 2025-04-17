@@ -11,7 +11,7 @@ class ConsultationSlot(models.Model):
     is_booked = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"Слот для {self.seller.username} с {self.start_time.strftime('%d.%m.%Y %H:%M')} по {self.end_time.strftime('%d.%m.%Y %H:%M')}"
+        return f"Вы записались на консультацию к {self.seller.username} в {self.start_time.strftime('%d.%m.%Y %H:%M')}"
 
 class ConsultationBooking(models.Model):
     slot = models.ForeignKey(ConsultationSlot, on_delete=models.CASCADE, related_name='bookings')

@@ -11,7 +11,7 @@ import datetime
 from .forms import ConsultationSlotForm
 from django.utils import timezone # Импортируем timezone
 from django.conf import settings 
-
+from django.db import transaction # Импортируем transaction для атомарности
 
 
 @login_required
@@ -77,22 +77,64 @@ def seller_slots_view(request):
     return render(request, 'main/seller_slots.html', {'form': form, 'slots': slots})
 
 
+
+
+
+
+@login_required # Только авторизованные пользователи могут записываться
 def service_consultation_view(request, service_id):
-    service = get_object_or_404(Service, pk=service_id) 
-    seller = service.user 
-    available_slots = ConsultationSlot.objects.filter(seller=seller, is_booked=False, start_time__gte=datetime.datetime.now()).order_by('start_time') # нет мы не будем смотреть в прошлое
+    service = get_object_or_404(Service, pk=service_id)
+    seller = service.user
+
+    # Находим ближайший доступный слот продавца, который еще не прошел
+    nearest_available_slot = ConsultationSlot.objects.filter(
+        seller=seller,
+        is_booked=False,
+        start_time__gte=timezone.now() # Ищем слоты, начинающиеся не раньше текущего момента
+    ).order_by('start_time').first() # Сортируем по времени начала и берем первый
 
     if request.method == 'POST':
-        slot_id = request.POST.get('slot_id')
-        if slot_id:
-            slot = get_object_or_404(ConsultationSlot, pk=slot_id, is_booked=False, seller=seller)
-            ConsultationBooking.objects.create(slot=slot, client=request.user) 
-            slot.is_booked = True 
-            slot.save()
-            return render(request, 'main/consultation_success.html', {'slot': slot}) 
-        else:
-            return render(request, 'main/service_consultation.html', {'service': service, 'slots': available_slots, 'error': 'Выберите время консультации.'}) # Ошибка, если не выбран слот
-    return render(request, 'main/service_consultation.html', {'service': service, 'slots': available_slots})
+        # Проверяем еще раз, есть ли доступный слот (на случай, если его забронировали между GET и POST)
+        if nearest_available_slot:
+            # Используем транзакцию для атомарности операции бронирования
+            try:
+                with transaction.atomic():
+                    # Блокируем слот для обновления, чтобы избежать гонки условий
+                    slot_to_book = ConsultationSlot.objects.select_for_update().get(
+                        pk=nearest_available_slot.pk,
+                        is_booked=False # Убеждаемся, что он все еще не забронирован
+                    )
+                    ConsultationBooking.objects.create(slot=slot_to_book, client=request.user)
+                    slot_to_book.is_booked = True
+                    slot_to_book.save()
+                    return render(request, 'main/consultation_success.html', {'slot': slot_to_book})
+            except ConsultationSlot.DoesNotExist:
+                # Слот был забронирован кем-то другим или удален
+                pass # Просто покажем сообщение ниже, что нет доступных слотов
+            except Exception as e:
+                # Обработка других возможных ошибок транзакции
+                print(f"Ошибка при бронировании слота: {e}") # Логирование ошибки
+                # Можно добавить сообщение об ошибке для пользователя
+
+        # Если слот не найден или возникла ошибка
+        context = {
+            'service': service,
+            'seller': seller,
+            'error': 'К сожалению, не удалось найти или забронировать ближайший доступный слот. Попробуйте позже.'
+        }
+        return render(request, 'main/service_consultation.html', context)
+
+    # Если метод GET
+    context = {
+        'service': service,
+        'seller': seller,
+        'nearest_slot': nearest_available_slot, 
+    }
+    return render(request, 'main/service_consultation.html', context)
+
+
+
+
 
 
 

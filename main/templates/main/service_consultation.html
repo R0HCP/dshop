@@ -4,31 +4,23 @@
 
 {% block content %}
     <h2>Запись на консультацию для "{{ service.title }}"</h2>
-    <p>Продавец: {{ service.user.username }}</p>
+    <p>Продавец: <a href="{% url 'seller_detail' seller.id %}">{{ seller.username }}</a></p>
 
     {% if error %}
-        <div class="alert alert-danger" role="alert">
-            {{ error }}
-        </div>
+        <p style="color: red;">{{ error }}</p>
     {% endif %}
 
-    <h3>Доступные слоты:</h3>
-    {% if slots %}
+    {% if nearest_slot %}
+        <h3>доступное время:</h3>
+        {% comment %} <p><strong>{{ nearest_slot }}</strong></p> {% endcomment %}
+
         <form method="post">
             {% csrf_token %}
-            <div class="form-check">
-                {% for slot in slots %}
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="slot_id" value="{{ slot.id }}" id="slot-{{ slot.id }}">
-                        <label class="form-check-label" for="slot-{{ slot.id }}">{{ slot }}</label>
-                    </div>
-                {% endfor %}
-            </div>
-            <button type="submit" class="btn btn-primary">Записаться на консультацию</button>
+            <button type="submit">Записаться </button>
         </form>
     {% else %}
-        <p class="lead"> нет доступных слотов для консультаций.</p>
+        <p>К сожалению, на данный момент нет консультаций .</p>
     {% endif %}
 
-    <a href="{% url 'service_detail' service.id %}" class="btn btn-secondary">Вернуться к услуге</a>
+    <a href="{% url 'service_detail' service.id %}">Вернуться к услуге</a>
 {% endblock %}
