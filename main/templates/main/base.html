@@ -16,7 +16,7 @@
 
     <nav class="navbar navbar-expand-lg bg-body-tertiary border-bottom"> 
 
-      {% if user.is_staff or user.is_superuser %}
+      {% if user.is_superuser %}
           {% with pending_count=pending_services|length %}
               {% if pending_count > 0 %}
                   <a href="/" class="text-warning">
@@ -44,6 +44,12 @@
                 <a class="nav-link" href="{% url 'add_service' %}">Добавить услугу</a>
             </li>
             {% endif %}
+            {% if user.is_superuser %}
+            <li class="nav-item">
+              <a href="{% url 'admin_sales_report' %}">сосал?</a> 
+            </li>
+            {% endif %}
+
           </ul>
           <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
              <li class="nav-item me-2">

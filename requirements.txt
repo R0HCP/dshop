@@ -6,3 +6,4 @@ tzdata
 phonenumbers
 python-dotenv
 reportlab
+matplotlib

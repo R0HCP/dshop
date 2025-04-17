@@ -1,0 +1,14 @@
+{% extends 'main/base.html' %} 
+
+{% block title %}Отчет о продажах{% endblock %}
+
+{% block content %}
+    <h2>Отчет о продажах</h2>
+    <p>Выберите период для генерации отчета:</p>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Сгенерировать отчет (PDF)</button>
+    </form>
+{% endblock %}

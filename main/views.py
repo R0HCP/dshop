@@ -3,29 +3,196 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.admin.views.decorators import staff_member_required
-from .forms import CustomUserCreationForm, CustomAuthenticationForm, AddServiceForm, OrderServiceForm, EditServiceForm 
+from .forms import CustomUserCreationForm, CustomAuthenticationForm, AddServiceForm, OrderServiceForm, EditServiceForm, UserProfileEditForm, ConsultationSlotForm, DateRangeForm
 from .models import Service, Order, Holiday, User, Category, ConsultationSlot, ConsultationBooking
-from .forms import UserProfileEditForm
 from django.http import HttpResponse, HttpResponseForbidden, JsonResponse 
 import datetime
-from .forms import ConsultationSlotForm
-from django.utils import timezone # Импортируем timezone
+from django.utils import timezone
 from django.conf import settings 
 from django.db import transaction # Импортируем transaction для атомарности
 from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import letter
+from reportlab.lib.pagesizes import letter, landscape
 from reportlab.lib.units import inch
 from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 from reportlab.lib import colors
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 import io
+from django.db.models import Count, Sum, F
+from django.db.models.functions import TruncDate
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image, PageBreak, Table, TableStyle
+
+try:
+    pdfmetrics.registerFont(TTFont('IBMPlexSerif-Regular', 'static/fonts/IBMPlexSerif-Regular.ttf'))
+except Exception as e:
+    print(f"Ошибка загрузки шрифта IBMPlexSerif-Regular для PDF: {e}")
+
+@staff_member_required
+def admin_sales_report_view(request):
+    if request.method == 'POST':
+        form = DateRangeForm(request.POST)
+        if form.is_valid():
+            start_date = form.cleaned_data['start_date']
+            end_date = form.cleaned_data['end_date']
+
+            end_date_with_time = timezone.make_aware(
+                datetime.datetime.combine(end_date, datetime.time.max)
+            )
+
+            category_sales = Order.objects.filter(
+                created_at__gte=start_date,
+                created_at__lte=end_date_with_time
+            ).select_related('service__category').values(
+                'service__category__name'
+            ).annotate(
+                total_quantity=Sum('quantity'),
+                total_revenue=Sum('total_price')
+            ).order_by('-total_revenue')
+
+            daily_category_sales = Order.objects.filter(
+                created_at__gte=start_date,
+                created_at__lte=end_date_with_time
+            ).annotate(
+                date=TruncDate('created_at')
+            ).values(
+                'date', 'service__category__name'
+            ).annotate(
+                daily_quantity=Sum('quantity')
+            ).order_by('date', 'service__category__name')
+
+            pdf_buffer = generate_sales_report_pdf(
+                start_date, end_date, category_sales, daily_category_sales, request.user
+            )
+
+            response = HttpResponse(pdf_buffer, content_type='application/pdf')
+            response['Content-Disposition'] = f'attachment; filename="sales_report_{start_date}_to_{end_date}.pdf"'
+            return response
+    else:
+        form = DateRangeForm()
+
+    return render(request, 'main/admin_sales_report.html', {'form': form})
+
+def generate_sales_report_pdf(start_date, end_date, category_sales, daily_category_sales, user):
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=landscape(letter))
+    styles = getSampleStyleSheet()
+    styles['Normal'].fontName = 'IBMPlexSerif-Regular'
+    styles['Heading1'].fontName = 'IBMPlexSerif-Regular'
+    styles['Heading2'].fontName = 'IBMPlexSerif-Regular'
+
+    story = []
+
+    story.append(Paragraph(f"Отчет о продажах с {start_date.strftime('%d.%m.%Y')} по {end_date.strftime('%d.%m.%Y')}", styles['h1']))
+    story.append(Paragraph(f"Сгенерирован: {timezone.now().strftime('%d.%m.%Y %H:%M')} пользователем {user.username}", styles['Normal']))
+    story.append(Spacer(1, 0.3*inch))
+
+    story.append(Paragraph("Общие продажи по категориям", styles['h2']))
+    story.append(Spacer(1, 0.1*inch))
+
+    data_cat_table = [['Категория', 'Продано (шт.)', 'Выручка (руб.)']]
+    category_names = []
+    category_revenues = []
+    for sale in category_sales:
+        category_name = sale['service__category__name'] if sale['service__category__name'] else 'Без категории'
+        data_cat_table.append([
+            category_name,
+            str(sale['total_quantity']),
+            f"{sale['total_revenue']:.2f}"
+        ])
+        category_names.append(category_name)
+        category_revenues.append(float(sale['total_revenue'])) # Для графика
+
+    if data_cat_table:
+        cat_table = Table(data_cat_table)
+        cat_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, -1), 'IBMPlexSerif-Regular'),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ]))
+        story.append(cat_table)
+        story.append(Spacer(1, 0.3*inch))
+
+        if category_names and category_revenues:
+            story.append(Paragraph("Распределение выручки по категориям", styles['h2']))
+            story.append(Spacer(1, 0.1*inch))
+            try:
+                fig, ax = plt.subplots(figsize=(6, 6)) 
+                ax.pie(category_revenues, labels=category_names, autopct='%1.1f%%', startangle=90)
+                ax.axis('equal') 
+                plt.title("Выручка по категориям", fontname='IBMPlexSerif-Regular')
+
+                img_buffer = io.BytesIO()
+                plt.savefig(img_buffer, format='png', bbox_inches='tight')
+                plt.close(fig)
+                img_buffer.seek(0)
+                story.append(Image(img_buffer, width=4*inch, height=4*inch))
+                story.append(Spacer(1, 0.3*inch))
+            except Exception as e:
+                story.append(Paragraph(f"Не удалось создать круговую диаграмму: {e}", styles['Normal']))
+
+    story.append(PageBreak()) 
+    story.append(Paragraph("Динамика продаж по дням и категориям", styles['h2']))
+    story.append(Spacer(1, 0.1*inch))
+
+    # Подготовка данных для графика
+    dates = sorted(list(set(item['date'] for item in daily_category_sales)))
+    categories_in_period = sorted(list(set(item['service__category__name'] if item['service__category__name'] else 'Без категории' for item in daily_category_sales)))
+    sales_data_dict = {cat: {date: 0 for date in dates} for cat in categories_in_period}
+
+    for item in daily_category_sales:
+        category_name = item['service__category__name'] if item['service__category__name'] else 'Без категории'
+        sales_data_dict[category_name][item['date']] = item['daily_quantity']
+
+    if dates and categories_in_period:
+        try:
+            fig, ax = plt.subplots(figsize=(10, 5)) # Размер мерзкого графика
+
+            for category in categories_in_period:
+                quantities = [sales_data_dict[category][date] for date in dates]
+                ax.plot(dates, quantities, marker='o', linestyle='-', label=category)
+
+            ax.xaxis.set_major_locator(mdates.AutoDateLocator(minticks=5, maxticks=10)) # Автоматическое размещение тиков
+            ax.xaxis.set_major_formatter(mdates.DateFormatter('%d.%m.%Y'))
+            plt.xticks(rotation=45, ha='right') # Поворот дат
+
+            ax.set_xlabel("Дата", fontname='IBMPlexSerif-Regular')
+            ax.set_ylabel("Количество продано (шт.)", fontname='IBMPlexSerif-Regular')
+            ax.set_title("Продажи по дням и категориям", fontname='IBMPlexSerif-Regular')
+            ax.legend(prop={'family': 'IBMPlexSerif-Regular'}) 
+            ax.grid(True)
+            plt.tight_layout() 
+
+            img_buffer_daily = io.BytesIO()
+            plt.savefig(img_buffer_daily, format='png')
+            plt.close(fig)
+            img_buffer_daily.seek(0)
+            story.append(Image(img_buffer_daily, width=9*inch, height=4.5*inch)) 
+        except Exception as e:
+            story.append(Paragraph(f"Не удалось создать график по дням: {e}", styles['Normal']))
+    else:
+        story.append(Paragraph("Нет данных для построения графика по дням.", styles['Normal']))
+
+
+    try:
+        doc.build(story)
+    except Exception as e:
+        print(f"Ошибка сборки PDF: {e}")
+        buffer = io.BytesIO() # Возвращаем пустой буфер в случае ошибки сборки
+    buffer.seek(0)
+    return buffer
+
+
 
 @login_required
 def profile_view(request):
-    user_orders = Order.objects.filter(user=request.user).order_by('-created_at') # Получаем заказы пользователя
-    user_bookings = ConsultationBooking.objects.filter(client=request.user).select_related('slot').order_by('-booking_time') # Получаем бронирования пользователя
+    user_orders = Order.objects.filter(user=request.user).order_by('-created_at')
+    user_bookings = ConsultationBooking.objects.filter(client=request.user).select_related('slot').order_by('-booking_time')
 
     if request.method == 'POST':
         form = UserProfileEditForm(request.POST, request.FILES, instance=request.user)
@@ -125,24 +292,6 @@ def download_purchase_report_pdf(request):
     response['Content-Disposition'] = f'attachment; filename="purchase_report_{request.user.username}.pdf"'
     return response
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 @login_required
 def client_profile_view(request, booking_id):
     booking = get_object_or_404(ConsultationBooking, pk=booking_id, slot__seller=request.user) 
@@ -207,45 +356,34 @@ def seller_slots_view(request):
 
 
 
-
-
-
-@login_required # Только авторизованные пользователи могут записываться
+@login_required 
 def service_consultation_view(request, service_id):
     service = get_object_or_404(Service, pk=service_id)
     seller = service.user
 
-    # Находим ближайший доступный слот продавца, который еще не прошел
     nearest_available_slot = ConsultationSlot.objects.filter(
         seller=seller,
         is_booked=False,
-        start_time__gte=timezone.now() # Ищем слоты, начинающиеся не раньше текущего момента
-    ).order_by('start_time').first() # Сортируем по времени начала и берем первый
+        start_time__gte=timezone.now() 
+    ).order_by('start_time').first() 
 
     if request.method == 'POST':
-        # Проверяем еще раз, есть ли доступный слот (на случай, если его забронировали между GET и POST)
         if nearest_available_slot:
-            # Используем транзакцию для атомарности операции бронирования
             try:
                 with transaction.atomic():
-                    # Блокируем слот для обновления, чтобы избежать гонки условий
                     slot_to_book = ConsultationSlot.objects.select_for_update().get(
                         pk=nearest_available_slot.pk,
-                        is_booked=False # Убеждаемся, что он все еще не забронирован
+                        is_booked=False 
                     )
                     ConsultationBooking.objects.create(slot=slot_to_book, client=request.user)
                     slot_to_book.is_booked = True
                     slot_to_book.save()
                     return render(request, 'main/consultation_success.html', {'slot': slot_to_book})
             except ConsultationSlot.DoesNotExist:
-                # Слот был забронирован кем-то другим или удален
-                pass # Просто покажем сообщение ниже, что нет доступных слотов
+                pass 
             except Exception as e:
-                # Обработка других возможных ошибок транзакции
-                print(f"Ошибка при бронировании слота: {e}") # Логирование ошибки
-                # Можно добавить сообщение об ошибке для пользователя
+                print(f"Ошибка при бронировании слота: {e}") 
 
-        # Если слот не найден или возникла ошибка
         context = {
             'service': service,
             'seller': seller,
@@ -260,12 +398,6 @@ def service_consultation_view(request, service_id):
         'nearest_slot': nearest_available_slot, 
     }
     return render(request, 'main/service_consultation.html', context)
-
-
-
-
-
-
 
 def seller_detail_view(request, seller_id):
     seller = get_object_or_404(User, pk=seller_id)

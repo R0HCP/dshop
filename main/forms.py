@@ -1,11 +1,24 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .models import User, Service, Order, ConsultationSlot
-
-
-from django import forms
-from .models import ConsultationSlot
 import datetime
+
+
+
+
+
+class DateRangeForm(forms.Form):
+    start_date = forms.DateField(
+        label="Начальная дата",
+        widget=forms.DateInput(attrs={'type': 'date'}),
+        required=True,
+    )
+    end_date = forms.DateField(
+        label="Конечная дата",
+        widget=forms.DateInput(attrs={'type': 'date'}),
+        required=True,
+    )
+
 
 class ConsultationSlotForm(forms.Form): 
     days_of_week = forms.MultipleChoiceField(
