@@ -29,6 +29,32 @@ try:
 except Exception as e:
     print(f"Ошибка загрузки шрифта IBMPlexSerif-Regular для PDF: {e}")
 
+
+def price_list_view(request):
+    services = Service.objects.filter(isAvaliable=True).select_related('category', 'user').order_by('category__name', 'title') # Получаем все доступные услуги, сортируем по категории и названию
+    categories = Category.objects.all().order_by('name') # Получаем все категории для фильтра
+
+    # Фильтрация по категориям
+    category_id = request.GET.get('category')
+    selected_category_id = None
+    if category_id:
+        try:
+            selected_category_id = int(category_id) # Преобразуем в int для сравнения в шаблоне
+            services = services.filter(category_id=category_id)
+        except (ValueError, TypeError):
+            pass # Игнорируем нечисловые значения категории
+
+    context = {
+        'services': services,
+        'categories': categories,
+        'selected_category_id': selected_category_id, # Передаем ID выбранной категории
+    }
+    return render(request, 'main/price_list.html', context)
+
+
+
+
+
 @staff_member_required
 def admin_sales_report_view(request):
     if request.method == 'POST':
@@ -125,7 +151,7 @@ def generate_sales_report_pdf(start_date, end_date, category_sales, daily_catego
                 fig, ax = plt.subplots(figsize=(6, 6)) 
                 ax.pie(category_revenues, labels=category_names, autopct='%1.1f%%', startangle=90)
                 ax.axis('equal') 
-                plt.title("Выручка по категориям", fontname='IBMPlexSerif-Regular')
+                plt.title("Выручка по категориям", fontname='IBMPlexSerif')
 
                 img_buffer = io.BytesIO()
                 plt.savefig(img_buffer, format='png', bbox_inches='tight')
@@ -161,10 +187,14 @@ def generate_sales_report_pdf(start_date, end_date, category_sales, daily_catego
             ax.xaxis.set_major_formatter(mdates.DateFormatter('%d.%m.%Y'))
             plt.xticks(rotation=45, ha='right') # Поворот дат
 
-            ax.set_xlabel("Дата", fontname='IBMPlexSerif-Regular')
-            ax.set_ylabel("Количество продано (шт.)", fontname='IBMPlexSerif-Regular')
-            ax.set_title("Продажи по дням и категориям", fontname='IBMPlexSerif-Regular')
-            ax.legend(prop={'family': 'IBMPlexSerif-Regular'}) 
+            ax.set_xlabel("Дата", fontname='IBMPlexSerif')
+            ax.set_ylabel("Количество продано (шт.)", fontname='IBMPlexSerif')
+            ax.set_title("Продажи по дням и категориям", fontname='IBMPlexSerif')
+            ax.legend(prop={'family': 'IBMPlexSerif'}) 
+            # ax.set_xlabel("Дата", fontname='IBMPlexSerif-Regular')
+            # ax.set_ylabel("Количество продано (шт.)", fontname='IBMPlexSerif-Regular')
+            # ax.set_title("Продажи по дням и категориям", fontname='IBMPlexSerif-Regular')
+            # ax.legend(prop={'family': 'IBMPlexSerif-Regular'}) 
             ax.grid(True)
             plt.tight_layout() 
 

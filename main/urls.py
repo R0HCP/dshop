@@ -27,5 +27,6 @@ urlpatterns = [
     path('service/<int:service_id>/consultation/', views.service_consultation_view, name='service_consultation'), # Страница консультации для услуги
     path('booking/<int:booking_id>/client_profile/', views.client_profile_view, name='client_profile'), # Страница профиля клиента
     path('profile/download_report/', views.download_purchase_report_pdf, name='download_purchase_report'),
-    path('profile/sales_report/', views.admin_sales_report_view, name='admin_sales_report')
+    path('profile/sales_report/', views.admin_sales_report_view, name='admin_sales_report'),
+    path('price-list/', views.price_list_view, name='price_list'), # URL для прейскуранта
 ]

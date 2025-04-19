@@ -46,9 +46,14 @@
             {% endif %}
             {% if user.is_superuser %}
             <li class="nav-item">
-              <a href="{% url 'admin_sales_report' %}">сосал?</a> 
+              <a class="nav-link" href="{% url 'admin_sales_report' %}">сосал?</a> 
             </li>
+            
             {% endif %}
+            
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'price_list' %}">Прейскурант</a> {# <--- Ссылка на прейскурант #}
+            </li>
 
           </ul>
           <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
