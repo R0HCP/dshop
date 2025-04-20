@@ -31,7 +31,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=250, null=True, blank=True)
     last_name = models.CharField(max_length=250, null=True, blank=True)
     dateregister = models.DateTimeField(auto_now_add=True)
-    isTrusted = models.BooleanField(default=True)
+    isTrusted = models.BooleanField(default=False)
     pfp = models.ImageField(upload_to='pfp/', null=True, blank=True)
     office_latitude = models.FloatField(null=True, blank=True, verbose_name="Широта офиса") 
     office_longitude = models.FloatField(null=True, blank=True, verbose_name="Долгота офиса")
