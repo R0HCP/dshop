@@ -3,55 +3,69 @@
 {% block title %}Прейскурант услуг{% endblock %}
 
 {% block content %}
-    <h1>Прейскурант услуг</h1>
+<div class="container mt-4"> {# Обертка для центрирования и отступов #}
+    <h1 class="text-center mb-4">Прейскурант услуг</h1>
 
-    <form method="get" action="{% url 'price_list' %}">
-        <label for="category_filter">Фильтр по категориям:</label>
-        <select name="category" id="category_filter" onchange="this.form.submit()">
-            <option value="">Все категории</option>
-            {% for category in categories %}
-                <option value="{{ category.id }}" {% if selected_category_id == category.id %}selected{% endif %}>{{ category.name }}</option>
-            {% endfor %}
-        </select>
-        <button type="submit">Фильтровать</button> {# Можно убрать кнопку, т.к. есть onchange #}
+    {# Форма фильтра #}
+    <form method="get" action="{% url 'price_list' %}" class="row g-3 align-items-center mb-4 justify-content-center">
+        <div class="col-auto">
+            <label for="category_filter" class="col-form-label">Фильтр по категориям:</label> {# Используем col-form-label для выравнивания #}
+        </div>
+        <div class="col-auto">
+            <select name="category" id="category_filter" class="form-select" onchange="this.form.submit()">
+                <option value="">Все категории</option>
+                {% for category in categories %}
+                    <option value="{{ category.id }}" {% if selected_category_id == category.id %}selected{% endif %}>{{ category.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        {# Кнопка Фильтровать теперь не так нужна из-за onchange, но оставим для ясности #}
+        <div class="col-auto">
+            <button type="submit" class="btn btn-outline-secondary">Фильтровать</button>
+        </div>
     </form>
 
-    <hr>
-
+    {# Таблица с услугами #}
     {% if services %}
-        <table>
-            <thead>
-                <tr>
-                    <th>Название услуги</th>
-                    <th>Категория</th>
-                    <th>Продавец</th>
-                    <th>Цена</th>
-                    <th>Действие</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for service in services %}
+        <div class="table-responsive"> {# Обертка для адаптивности таблицы #}
+            <table class="table table-striped table-hover table-bordered"> {# Классы Bootstrap для таблицы #}
+                <thead class="table-light"> {# Стиль для заголовка таблицы #}
                     <tr>
-                        <td><a href="{% url 'service_detail' service.id %}">{{ service.title }}</a></td>
-                        <td>{% if service.category %}{{ service.category.name }}{% else %}Нет категории{% endif %}</td>
-                        <td><a href="{% url 'seller_detail' service.user.id %}">{{ service.user.username }}</a></td>
-                        <td>{{ service.price }}</td>
-                        <td>
-                            <form method="post" action="{% url 'add_to_cart' service.id %}" style="display: inline;">
-                                {% csrf_token %}
-                                <input type="hidden" name="quantity" value="1"> {# Добавляем 1 товар по умолчанию #}
-                                <button type="submit">В корзину</button>
-                            </form>
-                        </td>
+                        <th scope="col">Название услуги</th>
+                        <th scope="col">Категория</th>
+                        <th scope="col">Продавец</th>
+                        <th scope="col">Цена</th>
+                        <th scope="col" class="text-center">Действие</th> {# Центрируем заголовок действия #}
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody class="align-middle"> {# Выравниваем содержимое ячеек по вертикали #}
+                    {% for service in services %}
+                        <tr>
+                            <td><a href="{% url 'service_detail' service.id %}">{{ service.title }}</a></td>
+                            <td>{% if service.category %}{{ service.category.name }}{% else %}Нет категории{% endif %}</td>
+                            <td><a href="{% url 'seller_detail' service.user.id %}">{{ service.user.username }}</a></td>
+                            <td>{{ service.price }} ₽</td> {# Добавим знак рубля для наглядности #}
+                            <td class="text-center"> {# Центрируем кнопку #}
+                                <form method="post" action="{% url 'add_to_cart' service.id %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="quantity" value="1">
+                                    <button type="submit" class="btn btn-sm btn-success">В корзину</button> {# Классы для кнопки #}
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     {% else %}
-        <p>Нет услуг, соответствующих выбранным критериям.</p>
+        <div class="alert alert-info text-center" role="alert">
+            Нет услуг, соответствующих выбранным критериям.
+        </div>
     {% endif %}
 
-    <br>
-    <a href="/">Вернуться на главную страницу</a>
+    <div class="text-center mt-4"> {# Центрируем ссылку "Вернуться" #}
+        <a href="/" class="btn btn-secondary">Вернуться на главную страницу</a>
+    </div>
 
+</div>
 {% endblock %}

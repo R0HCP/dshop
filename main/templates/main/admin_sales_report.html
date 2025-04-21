@@ -1,14 +1,58 @@
-{% extends 'main/base.html' %} 
+{% extends 'main/base.html' %}
+{% load widget_tweaks %} {# Загружаем теги widget_tweaks #}
 
 {% block title %}Отчет о продажах{% endblock %}
 
 {% block content %}
-    <h2>Отчет о продажах</h2>
-    <p>Выберите период для генерации отчета:</p>
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Отчет о продажах</h2>
+    <p class="text-center mb-4">Выберите период для генерации отчета:</p>
 
-    <form method="post">
+    <form method="post" class="row g-3 justify-content-center" novalidate> {# Используем Bootstrap grid для центрирования и отступов #}
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Сгенерировать отчет (PDF)</button>
+
+        {# Вывод не-полевых ошибок #}
+        {% if form.non_field_errors %}
+            <div class="col-12 alert alert-danger">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        {# Итерация по видимым полям формы (предполагаем, что это поля даты) #}
+        {% for field in form.visible_fields %}
+            <div class="col-md-5"> {# Размещаем каждое поле примерно в половину ширины на средних экранах и больше #}
+                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+
+                {# Определяем класс и добавляем is-invalid при ошибках #}
+                {# Предполагаем, что это поля даты, используем form-control #}
+                {% if field.errors %}
+                    {% render_field field class+="form-control is-invalid" %}
+                {% else %}
+                    {% render_field field class+="form-control" %}
+                {% endif %}
+
+                {# Вывод подсказки для поля #}
+                {% if field.help_text %}
+                    <div class="form-text">{{ field.help_text }}</div>
+                {% endif %}
+
+                {# Вывод ошибок для конкретного поля #}
+                {% if field.errors %}
+                    <div class="invalid-feedback d-block">
+                        {{ field.errors }}
+                    </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+
+        {# Скрытые поля формы (если есть) #}
+        {% for hidden_field in form.hidden_fields %}
+            {{ hidden_field }}
+        {% endfor %}
+
+        <div class="col-12 text-center mt-4"> {# Кнопка под полями, по центру #}
+            <button type="submit" class="btn btn-primary">Сгенерировать отчет (PDF)</button>
+        </div>
     </form>
+</div>
 {% endblock %}

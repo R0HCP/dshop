@@ -3,33 +3,88 @@
 {% block title %}Корзина{% endblock %}
 
 {% block content %}
-    <h2>Корзина</h2>
+<div class="container mt-4"> {# Обертка для центрирования и отступов #}
+    <h2 class="text-center mb-4">Корзина</h2>
+
+    {# Отображение ошибок, если они переданы из checkout_view #}
+    {% if errors %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+             {% for error in errors %}
+                 <p class="mb-0">{{ error }}</p>
+             {% endfor %}
+             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endif %}
 
     {% if cart_items %}
-        <ul>
+        <div class="cart-items mb-4"> {# Контейнер для товаров корзины #}
             {% for item in cart_items %}
-                <li>
-                    <h3>{{ item.service.title }}</h3>
-                    <p>Цена за единицу: {{ item.service.price }}</p>
-                    <form method="post" action="{% url 'update_cart_quantity' item.service.id %}">
-                        {% csrf_token %}
-                        <label for="quantity_{{ item.service.id }}">Количество:</label>
-                        <input type="number" id="quantity_{{ item.service.id }}" name="quantity" value="{{ item.quantity }}" min="1">
-                        <button type="submit">Обновить</button>
-                    </form>
-                    <p>Итоговая цена: {{ item.total_price }}</p>
-                    <a href="{% url 'remove_from_cart' item.service.id %}">Удалить из корзины</a>
-                </li>
+            <div class="row border-bottom py-3 align-items-center"> {# Строка для каждого товара #}
+                {# Колонка для изображения и названия #}
+                <div class="col-md-5 col-lg-6">
+                    <div class="d-flex align-items-center">
+                        {% if item.service.images %}
+                            <img src="{{ item.service.images.url }}" alt="{{ item.service.title }}" class="img-fluid rounded me-3" style="width: 80px; height: 80px; object-fit: cover;">
+                        {% else %}
+                            {# Можно добавить плейсхолдер, если нет изображения #}
+                            <div class="bg-secondary rounded me-3" style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; color: white;">Фото</div>
+                        {% endif %}
+                        <div>
+                            <h5 class="mb-1"><a href="{% url 'service_detail' item.service.id %}" class="text-decoration-none">{{ item.service.title }}</a></h5>
+                            <p class="mb-1 text-muted">Цена за единицу: {{ item.service.price }} ₽</p>
+                        </div>
+                    </div>
+                </div>
+
+                {# Колонка для количества, цены и удаления #}
+                <div class="col-md-7 col-lg-6">
+                    <div class="row align-items-center">
+                        {# Форма обновления количества #}
+                        <div class="col-lg-5 col-md-6 mb-2 mb-md-0">
+                            <form method="post" action="{% url 'update_cart_quantity' item.service.id %}" class="d-inline-flex align-items-center">
+                                {% csrf_token %}
+                                <label for="quantity_{{ item.service.id }}" class="visually-hidden">Количество:</label> {# Скрытая метка для доступности #}
+                                <input type="number" id="quantity_{{ item.service.id }}" name="quantity" value="{{ item.quantity }}" min="1" class="form-control form-control-sm" style="width: 70px;" aria-label="Количество">
+                                <button type="submit" class="btn btn-sm btn-outline-secondary ms-2">Обновить</button>
+                            </form>
+                        </div>
+                        {# Итоговая цена за позицию #}
+                        <div class="col-lg-4 col-md-3 text-md-end mb-2 mb-md-0">
+                            <span class="fw-bold">{{ item.total_price }} ₽</span>
+                        </div>
+                        {# Кнопка удаления #}
+                        <div class="col-lg-3 col-md-3 text-md-end">
+                             <a href="{% url 'remove_from_cart' item.service.id %}" class="btn btn-sm btn-outline-danger" title="Удалить из корзины">× Удалить</a>
+                        </div>
+                    </div>
+                </div>
+            </div> {# Конец строки товара #}
             {% endfor %}
-        </ul>
+        </div>
 
-        <h3>Итоговая стоимость корзины: {{ total_price }}</h3>
+        {# Итоговая стоимость #}
+        <div class="d-flex justify-content-end mb-4">
+            <h4>Итоговая стоимость: <span class="fw-bold">{{ total_price }} ₽</span></h4>
+        </div>
 
-        <a href="{% url 'clear_cart' %}">Очистить корзину</a>
-        <a href="/">Продолжить покупки</a>
-        <a href="{% url 'checkout' %}">Оформить заказ</a> 
+        {# Кнопки действий #}
+        <div class="d-flex justify-content-between flex-column flex-sm-row gap-2">
+             <div>
+                 <a href="{% url 'clear_cart' %}" class="btn btn-outline-danger">Очистить корзину</a>
+                 <a href="/" class="btn btn-outline-secondary">Продолжить покупки</a>
+             </div>
+             <div>
+                 <a href="{% url 'checkout' %}" class="btn btn-primary btn-lg">Оформить заказ</a> {# Кнопка побольше #}
+             </div>
+        </div>
+
     {% else %}
-        <p>Ваша корзина пуста.</p>
-        <a href="/">Продолжить покупки</a>
+        <div class="alert alert-info text-center" role="alert">
+            Ваша корзина пуста.
+        </div>
+        <div class="text-center">
+            <a href="/" class="btn btn-primary">Продолжить покупки</a>
+        </div>
     {% endif %}
+</div>
 {% endblock %}

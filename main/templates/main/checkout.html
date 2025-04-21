@@ -3,30 +3,66 @@
 {% block title %}Оформление заказа{% endblock %}
 
 {% block content %}
-    <h2>Оформление заказа</h2>
+<div class="container mt-4"> {# Обертка для центрирования и отступов #}
+    <h2 class="text-center mb-4">Оформление заказа</h2>
+
+    {# Отображение ошибок, если они были переданы (например, из проверки наличия) #}
+    {% if errors %}
+        <div class="alert alert-danger" role="alert">
+            <h4 class="alert-heading">Возникли проблемы:</h4>
+            <ul class="mb-0">
+                {% for error in errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+            <hr>
+            <p class="mb-0">Пожалуйста, <a href="{% url 'view_cart' %}" class="alert-link">вернитесь в корзину</a> и внесите изменения.</p>
+        </div>
+    {% endif %}
 
     {% if cart_items %}
-        <ul>
-            {% for item in cart_items %}
-                <li>
-                    <h3>{{ item.service.title }}</h3>
-                    <p>Количество: {{ item.quantity }}</p>
-                    <p>Цена за единицу: {{ item.service.price }}</p>
-                    <p>Итоговая цена: {{ item.total_price }}</p>
-                </li>
-            {% endfor %}
-        </ul>
+        <div class="row justify-content-center">
+            <div class="col-lg-8"> {# Ограничиваем ширину для лучшей читаемости #}
 
-        <h3>Итоговая стоимость заказа: {{ total_price }}</h3>
+                <h4 class="mb-3">Ваш заказ:</h4>
+                <ul class="list-group mb-4">
+                    {% for item in cart_items %}
+                    <li class="list-group-item d-flex justify-content-between lh-sm">
+                        <div>
+                            <h6 class="my-0">{{ item.service.title }} (x{{ item.quantity }})</h6>
+                            <small class="text-muted">Цена за ед.: {{ item.service.price }} ₽</small>
+                        </div>
+                        <span class="text-muted">{{ item.total_price }} ₽</span>
+                    </li>
+                    {% endfor %}
+                    <li class="list-group-item d-flex justify-content-between bg-light">
+                        <span class="fw-bold">Итого:</span>
+                        <strong class="fw-bold">{{ total_price }} ₽</strong>
+                    </li>
+                </ul>
 
-        <form method="post">
-            {% csrf_token %}
-            <button type="submit">Подтвердить заказ</button>
-        </form>
+                {# Форма подтверждения заказа #}
+                <form method="post" class="text-center">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary btn-lg">Подтвердить и оформить заказ</button>
+                </form>
 
-        <a href="{% url 'view_cart' %}">Вернуться в корзину</a>
+                <div class="text-center mt-3">
+                    <a href="{% url 'view_cart' %}" class="btn btn-outline-secondary">Вернуться в корзину</a>
+                </div>
+
+            </div>
+        </div>
     {% else %}
-        <p>Ваша корзина пуста. Нечего оформлять.</p>
-        <a href="/">Продолжить покупки</a>
+        {# Если корзина пуста (например, после ошибки и возврата на эту страницу без товаров) #}
+        {% if not errors %} {# Показываем это сообщение, только если не было явных ошибок выше #}
+            <div class="alert alert-warning text-center" role="alert">
+                Ваша корзина пуста. Нечего оформлять.
+            </div>
+        {% endif %}
+        <div class="text-center">
+            <a href="/" class="btn btn-primary">Продолжить покупки</a>
+        </div>
     {% endif %}
+</div>
 {% endblock %}

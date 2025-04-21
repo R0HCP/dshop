@@ -3,8 +3,29 @@
 {% block title %}Заказ оформлен{% endblock %}
 
 {% block content %}
-    <h2>Заказ успешно оформлен!</h2>
-    <p>Спасибо за ваш заказ на сумму {{ total_price }}!</p> 
-    <p>В ближайшее время с вами свяжется наш менеджер для уточнения деталей.</p>
-    <a href="/">Вернуться на главную страницу</a>
+<div class="container mt-5 text-center"> {# Центрированный контейнер с верхним отступом #}
+
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6"> {# Ограничиваем ширину для лучшего вида #}
+
+            <div class="card shadow-sm p-4"> {# Используем карточку для визуального выделения #}
+                <div class="card-body">
+                    {# Можно добавить иконку успеха (например, из Bootstrap Icons или FontAwesome) #}
+                    {# <i class="bi bi-check-circle-fill text-success" style="font-size: 3rem;"></i> #}
+                    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-check-circle-fill text-success mb-3" viewBox="0 0 16 16">
+                      <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                    </svg>
+
+                    <h2 class="card-title mb-3">Заказ успешно оформлен!</h2>
+                    <p class="card-text lead">Спасибо за ваш заказ на сумму <strong class="text-primary">{{ total_price }} ₽</strong>!</p> {# Используем lead и выделяем сумму #}
+                    <p class="card-text">В ближайшее время с вами свяжется наш менеджер для уточнения деталей.</p>
+                    <hr class="my-4"> {# Горизонтальная линия для разделения #}
+                    <a href="/" class="btn btn-primary">Вернуться на главную страницу</a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
 {% endblock %}

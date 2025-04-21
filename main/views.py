@@ -236,6 +236,7 @@ def profile_view(request):
             return redirect('profile')
     else:
         form = UserProfileEditForm(instance=request.user)
+        
 
     context = {
         'form': form,
@@ -776,7 +777,7 @@ def add_service_view(request):
         if form.is_valid():
             service = form.save(commit=False)
             service.user = request.user
-            service.status = 'pending' 
+            service.status = 'approved' 
             service.save()
             return redirect('service_detail', service_id=service.id)
     else:
