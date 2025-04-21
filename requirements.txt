@@ -7,3 +7,4 @@ phonenumbers
 python-dotenv
 reportlab
 matplotlib
+django-widget-tweaks

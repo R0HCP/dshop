@@ -85,7 +85,7 @@ class Service(models.Model):
     isAvaliable = models.BooleanField(default=True)
     quantity = models.PositiveIntegerField(default=1)
     execution_time_days = models.PositiveIntegerField(default=1, help_text="Время выполнения услуги в рабочих днях") 
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='approved')
     moderated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='moderated_services') 
     moderated_at = models.DateTimeField(null=True, blank=True) 
     

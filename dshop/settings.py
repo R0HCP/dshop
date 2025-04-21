@@ -40,6 +40,7 @@ ALLOWED_HOSTS = ['*'] # разрешаем все хосты
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
+    'widget_tweaks',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
