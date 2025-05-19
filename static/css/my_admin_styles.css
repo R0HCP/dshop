@@ -1,0 +1,5 @@
+.font-weight-light {
+    color: transparent !important; /* Делаем цвет текста прозрачным */
+    /* Можно также попробовать visibility: hidden; или display: none;,
+       но display: none; уберет его и для скринридеров */
+}

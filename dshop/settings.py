@@ -38,6 +38,7 @@ ALLOWED_HOSTS = ['*'] # разрешаем все хосты
 # Application definition
 # тут обязательно добавляем новые приложения
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'widget_tweaks',
@@ -144,3 +145,102 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# settings.py (в конце файла или где вам удобно хранить настройки)
+
+JAZZMIN_SETTINGS = {
+    # Название вашего сайта, которое будет отображаться в шапке (вместо Django Aдминистрирование)
+    "site_title": "Админка Моего Магазина",
+
+    # Короткое название для логотипа (отображается, когда боковая панель свернута)
+    "site_header": "Магазин",
+
+    # Путь к вашему логотипу (относительно папки static/) Может быть None, тогда будет просто текст
+    "site_logo": "img/my_logo.png",  # Пример, замените на ваш путь, если есть лого
+
+    # Текст приветствия на странице входа
+    "welcome_sign": "Добро пожаловать в админку!",
+
+    # Copyright на странице входа/футере (можете оставить пустым)
+    "copyright": "Мой Магазин Ltd",
+
+    # Модель для поиска (должна быть зарегистрирована в админке)
+    "search_model": "auth.User", # Пример, можете указать свою основную модель для поиска
+
+    # Порядок приложений в боковом меню. Вы можете перечислить их явно
+    # или использовать "app_label" (название вашего приложения)
+    "order_with_respect_to": ["auth", "main", "main.Category", "main.Service"], # Пример
+
+    # Кастомные ссылки в шапке (например, на основной сайт)
+    "topmenu_links": [
+        # Ссылка на основной сайт
+        {"name": "На сайт",  "url": "/", "permissions": ["auth.view_user"]},
+
+        # Модель App
+        {"model": "auth.User"},
+
+        # Внешняя ссылка
+        # {"name": "Поддержка", "url": "https://github.com/farridav/django-jazzmin/issues", "new_window": True},
+    ],
+
+    # Иконки для моделей (используются иконки Font Awesome)
+    # https://fontawesome.com/icons?d=gallery&m=free
+    "icons": {
+        "auth": "fas fa-users-cog",
+        "auth.user": "fas fa-user",
+        "auth.Group": "fas fa-users",
+        "main.Service": "fas fa-concierge-bell",
+        "main.Category": "fas fa-tags",
+        "main.Order": "fas fa-shopping-cart",
+        "main.ConsultationSlot": "far fa-calendar-alt",
+        "main.ConsultationBooking": "far fa-calendar-check",
+        "main.Holiday": "fas fa-tree",
+    },
+
+    # Скрыть определенные приложения в меню?
+    # "hide_apps": [],
+
+    # Скрыть определенные модели в меню? (например, если они управляются через inline)
+    # "hide_models": [],
+
+    # Изменить стандартную тему (по умолчанию "default", есть "cerulean", "cosmo", "flatly", "journal", "litera", "lumen", "lux", "materia", "minty", "pulse", "sandstone", "simplex", "sketchy", "slate", "solar", "spacelab", "superhero", "united", "yeti")
+    "theme": "default",
+
+    # Показывать UI кастомайзер? (позволяет менять тему и некоторые опции на лету)
+    "show_ui_builder": True, # Рекомендую включить на время настройки, потом можно выключить
+    "custom_css": "css/my_admin_styles.css", # Путь к вашему CSS файлу
+}
+
+# Дополнительные настройки для UI кастомайзера (если show_ui_builder = True)
+JAZZMIN_UI_TWEAKS = {
+    "navbar_small_text": False,
+    "footer_small_text": False,
+    "body_small_text": False,
+    "brand_small_text": False,
+    "brand_colour": False, # "navbar-indigo", "navbar-primary", etc.
+    "accent": "accent-primary", # "accent-primary", "accent-warning", etc.
+    "navbar": "navbar-white navbar-light", # "navbar-dark navbar-primary", etc.
+    "no_navbar_border": False,
+    "navbar_fixed": False,
+    "layout_boxed": False,
+    "footer_fixed": False,
+    "sidebar_fixed": True,
+    "sidebar": "sidebar-dark-primary", # "sidebar-dark-primary", "sidebar-light-primary", etc.
+    "sidebar_nav_small_text": False,
+    "sidebar_disable_expand": False,
+    "sidebar_nav_child_indent": False,
+    "sidebar_nav_compact_style": False,
+    "sidebar_nav_legacy_style": False,
+    "sidebar_nav_flat_style": False,
+    "theme": "default", # Повторяем здесь, чтобы UI кастомайзер знал тему по умолчанию
+    "dark_mode_theme": None, # "darkly", "cyborg", "slate", "solar", "superhero" - тема для темного режима
+    "button_classes": {
+        "primary": "btn-primary",
+        "secondary": "btn-secondary",
+        "info": "btn-info",
+        "warning": "btn-warning",
+        "danger": "btn-danger",
+        "success": "btn-success"
+    }
+}
+
