@@ -480,7 +480,7 @@ def checkout_view(request):
 
     if not cart:
         
-        return render(request, 'main/cart.html', {'cart_items': [], 'total_price': 0, 'errors': ['Ваша корзина пуста.']})
+        return render(request, 'main/cart.html', {'cart_items': [], 'total_price': 0, 'errors': ['Тут ничего нет .']})
 
     for service_id, quantity in list(cart.items()): 
         try:
@@ -528,7 +528,7 @@ def checkout_view(request):
 
             service.refresh_from_db() 
             if service.quantity < quantity or not service.isAvaliable:
-                 request.session['cart_errors'] = [f"К сожалению, количество товара '{service.title}' изменилось. Пожалуйста, проверьте корзину."]
+                 request.session['cart_errors'] = [f"К сожалению, количество товара '{service.title}' изменилось. Пожалуйста, проверьте наличие."]
                  current_cart = request.session.get('cart', {})
                  if str(service.id) in current_cart:
                      del current_cart[str(service.id)]
@@ -891,7 +891,7 @@ def checkout_view(request):
     errors = []
 
     if not cart:
-        return render(request, 'main/cart.html', {'cart_items': [], 'total_price': 0, 'errors': ['Ваша корзина пуста.']})
+        return render(request, 'main/cart.html', {'cart_items': [], 'total_price': 0, 'errors': ['Ничего нет.']})
 
     for service_id, quantity in list(cart.items()):
         try:
@@ -939,7 +939,7 @@ def checkout_view(request):
 
             service.refresh_from_db()
             if service.quantity < quantity or not service.isAvaliable:
-                request.session['cart_errors'] = [f"К сожалению, количество товара '{service.title}' изменилось. Пожалуйста, проверьте корзину."]
+                request.session['cart_errors'] = [f"К сожалению, количество товара '{service.title}' изменилось. Пожалуйста, проверьте наличие."]
                 current_cart = request.session.get('cart', {})
                 if str(service.id) in current_cart:
                     del current_cart[str(service.id)]

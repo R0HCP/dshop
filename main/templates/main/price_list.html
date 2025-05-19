@@ -49,7 +49,7 @@
                                 <form method="post" action="{% url 'add_to_cart' service.id %}">
                                     {% csrf_token %}
                                     <input type="hidden" name="quantity" value="1">
-                                    <button type="submit" class="btn btn-sm btn-success">В корзину</button> {# Классы для кнопки #}
+                                    <button type="submit" class="btn btn-sm btn-success">Добавить</button> {# Классы для кнопки #}
                                 </form>
                             </td>
                         </tr>

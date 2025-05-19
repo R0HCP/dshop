@@ -16,7 +16,7 @@
                 {% endfor %}
             </ul>
             <hr>
-            <p class="mb-0">Пожалуйста, <a href="{% url 'view_cart' %}" class="alert-link">вернитесь в корзину</a> и внесите изменения.</p>
+            <p class="mb-0">Пожалуйста, <a href="{% url 'view_cart' %}" class="alert-link">вернитесь</a> произошла неизвестная ошибка.</p>
         </div>
     {% endif %}
 
@@ -48,7 +48,7 @@
                 </form>
 
                 <div class="text-center mt-3">
-                    <a href="{% url 'view_cart' %}" class="btn btn-outline-secondary">Вернуться в корзину</a>
+                    <a href="{% url 'view_cart' %}" class="btn btn-outline-secondary">Вернуться</a>
                 </div>
 
             </div>
@@ -57,7 +57,7 @@
         {# Если корзина пуста (например, после ошибки и возврата на эту страницу без товаров) #}
         {% if not errors %} {# Показываем это сообщение, только если не было явных ошибок выше #}
             <div class="alert alert-warning text-center" role="alert">
-                Ваша корзина пуста. Нечего оформлять.
+                Тут ничего нет. Нечего оформлять.
             </div>
         {% endif %}
         <div class="text-center">

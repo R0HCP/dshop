@@ -1,10 +1,10 @@
 {% extends 'main/base.html' %}
 
-{% block title %}Корзина{% endblock %}
+{% block title %}Выбранные услуги{% endblock %}
 
 {% block content %}
 <div class="container mt-4"> {# Обертка для центрирования и отступов #}
-    <h2 class="text-center mb-4">Корзина</h2>
+    <h2 class="text-center mb-4">Выбранные услуги</h2>
 
     {# Отображение ошибок, если они переданы из checkout_view #}
     {% if errors %}
@@ -54,7 +54,7 @@
                         </div>
                         {# Кнопка удаления #}
                         <div class="col-lg-3 col-md-3 text-md-end">
-                             <a href="{% url 'remove_from_cart' item.service.id %}" class="btn btn-sm btn-outline-danger" title="Удалить из корзины">× Удалить</a>
+                             <a href="{% url 'remove_from_cart' item.service.id %}" class="btn btn-sm btn-outline-danger" title="Удалить">× Удалить</a>
                         </div>
                     </div>
                 </div>
@@ -70,7 +70,7 @@
         {# Кнопки действий #}
         <div class="d-flex justify-content-between flex-column flex-sm-row gap-2">
              <div>
-                 <a href="{% url 'clear_cart' %}" class="btn btn-outline-danger">Очистить корзину</a>
+                 <a href="{% url 'clear_cart' %}" class="btn btn-outline-danger">Очистить</a>
                  <a href="/" class="btn btn-outline-secondary">Продолжить покупки</a>
              </div>
              <div>
@@ -80,7 +80,7 @@
 
     {% else %}
         <div class="alert alert-info text-center" role="alert">
-            Ваша корзина пуста.
+            Тут ничего нет.
         </div>
         <div class="text-center">
             <a href="/" class="btn btn-primary">Продолжить покупки</a>
