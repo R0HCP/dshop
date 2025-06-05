@@ -119,6 +119,17 @@
                     {% if service.isAvaliable %}
                         <p class="card-text mb-3"><strong>В наличии:</strong> {{ service.quantity }}</p>
 
+                            {% if service.agreement_document %}
+                            <hr>
+                            <p>
+                                <strong>Документ договора:</strong>
+                                <a href="{{ service.agreement_document.url }}" target="_blank" download>
+                                    Скачать договор ({{ service.agreement_document.name|cut:"agreements/" }})
+                                </a>
+                                {# `|cut:"agreements/"` убирает префикс папки из имени файла для отображения #}
+                            </p>
+                        {% endif %}
+    
                         {% if user.is_authenticated %}
                             <form method="post" action="{% url 'add_to_cart' service.id %}" class="d-flex align-items-center">
                                 {% csrf_token %}

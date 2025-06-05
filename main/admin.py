@@ -48,11 +48,21 @@ class ServiceAdmin(admin.ModelAdmin):
     actions = [approve_services, reject_services] 
 
 
+class OrderAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user', 'service', 'quantity', 'total_price', 'created_at', 'status', 'estimated_completion_date')
+    list_filter = ('status', 'created_at', 'user', 'service__category') # Добавляем фильтры
+    search_fields = ('id', 'user__username', 'service__title') # Поля для поиска
+    list_editable = ('status',) # Разрешаем редактировать статус прямо в списке
+    date_hierarchy = 'created_at' # Иерархия по дате создания
+    ordering = ('-created_at',) # Сортировка по умолчанию
+
+
 admin.site.register(User, UserAdmin) # для админки
 admin.site.register(Service, ServiceAdmin) # да, и что теперь? 
-admin.site.register(Order)
+admin.site.register(Order, OrderAdmin)
 admin.site.register(Transaction)
 admin.site.register(Holiday) 
-admin.site.register(Category) 
+admin.site.register(Category)  
 admin.site.register(ConsultationSlot) 
 admin.site.register(ConsultationBooking) 
+ 

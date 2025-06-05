@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django import forms 
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.admin.views.decorators import staff_member_required
 from .forms import CustomUserCreationForm, CustomAuthenticationForm, AddServiceForm, OrderServiceForm, EditServiceForm, UserProfileEditForm, ConsultationSlotForm, DateRangeForm
@@ -23,6 +24,9 @@ from django.db.models.functions import TruncDate
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image, PageBreak, Table, TableStyle
+from .forms import UserProfileEditForm, AdminOrderStatusForm 
+from django.db.models import Q # Для сложных запросов
+from django.core.paginator import Paginator # Для пагинации (если заказов много)
 
 try:
     pdfmetrics.registerFont(TTFont('IBMPlexSerif-Regular', 'static/fonts/IBMPlexSerif-Regular.ttf'))
@@ -218,33 +222,127 @@ def generate_sales_report_pdf(start_date, end_date, category_sales, daily_catego
     return buffer
 
 
-
 @login_required
 def profile_view(request):
-    user_orders = Order.objects.filter(user=request.user).order_by('-created_at')
-    user_bookings = ConsultationBooking.objects.filter(client=request.user).select_related('slot').order_by('-booking_time')
+    current_user = request.user # Используем current_user для ясности, что это текущий пользователь сессии
+    user_profile_to_display = current_user # Пользователь, чей профиль мы отображаем (по умолчанию - свой)
 
+    # Получаем заказы и бронирования для текущего пользователя (клиента)
+    user_orders = Order.objects.filter(user=current_user).select_related('service').order_by('-created_at')
+    user_bookings = ConsultationBooking.objects.filter(client=current_user).select_related('slot', 'slot__seller').order_by('-slot__start_time')
+
+    # Инициализация переменных для администратора
+    admin_all_orders = None
+    order_status_form_dict = {}
+    order_filter_form = AdminOrderFilterForm(request.GET or None) # Инициализируем форму фильтра данными из GET или пустую
+
+    # Логика для администратора
+    if current_user.is_staff or current_user.is_superuser:
+        admin_all_orders_query = Order.objects.all().select_related('user', 'service', 'service__category').order_by('-created_at')
+
+        if order_filter_form.is_valid(): # Проверяем валидность формы фильтра
+            status = order_filter_form.cleaned_data.get('status')
+            category = order_filter_form.cleaned_data.get('category')
+            date_from = order_filter_form.cleaned_data.get('date_from')
+            date_to = order_filter_form.cleaned_data.get('date_to')
+            search_query = order_filter_form.cleaned_data.get('search_query')
+
+            if status:
+                admin_all_orders_query = admin_all_orders_query.filter(status=status)
+            if category:
+                admin_all_orders_query = admin_all_orders_query.filter(service__category=category)
+            if date_from:
+                admin_all_orders_query = admin_all_orders_query.filter(created_at__gte=date_from)
+            if date_to:
+                admin_all_orders_query = admin_all_orders_query.filter(created_at__lt=date_to + datetime.timedelta(days=1))
+            if search_query:
+                admin_all_orders_query = admin_all_orders_query.filter(
+                    Q(id__icontains=search_query) | # Поиск по ID заказа
+                    Q(user__username__icontains=search_query) |
+                    Q(service__title__icontains=search_query)
+                )
+        # Если форма фильтра невалидна или не отправлена, используем полный запрос
+        admin_all_orders = admin_all_orders_query
+
+        for order in admin_all_orders:
+            order_status_form_dict[order.id] = AdminOrderStatusForm(instance=order, prefix=f"order-{order.id}")
+
+    # Обработка POST-запросов
     if request.method == 'POST':
-        form = UserProfileEditForm(request.POST, request.FILES, instance=request.user)
-        if form.is_valid():
-            user = form.save(commit=False)
-            latitude_str = request.POST.get('office_latitude')
-            longitude_str = request.POST.get('office_longitude')
-            user.office_latitude = float(latitude_str) if latitude_str else None
-            user.office_longitude = float(longitude_str) if longitude_str else None
-            user.save()
-            return redirect('profile')
-    else:
-        form = UserProfileEditForm(instance=request.user)
-        
+        action = request.POST.get('action')
+
+        if action == 'save_profile':
+            profile_form = UserProfileEditForm(request.POST, request.FILES, instance=current_user)
+            if profile_form.is_valid():
+                saved_user = profile_form.save(commit=False)
+                latitude_str = request.POST.get('office_latitude')
+                longitude_str = request.POST.get('office_longitude')
+                saved_user.office_latitude = float(latitude_str) if latitude_str else None
+                saved_user.office_longitude = float(longitude_str) if longitude_str else None
+                saved_user.save()
+                # Можно добавить сообщение messages.success(request, 'Профиль успешно обновлен!')
+                return redirect('profile')
+            # Если форма профиля невалидна, она будет передана в контекст ниже
+        elif action == 'change_order_status':
+            if current_user.is_staff or current_user.is_superuser:
+                order_id = request.POST.get('order_id')
+                if order_id:
+                    order_to_update = get_object_or_404(Order, pk=order_id)
+                    # Пересоздаем форму с данными POST для конкретного заказа
+                    status_form = AdminOrderStatusForm(request.POST, instance=order_to_update, prefix=f"order-{order_id}")
+                    if status_form.is_valid():
+                        status_form.save()
+                        # messages.success(request, f'Статус заказа #{order_id} успешно изменен.')
+                        return redirect('profile')
+                    else:
+                        # Если форма статуса невалидна, нужно как-то обработать ошибку
+                        # Например, добавить ее в order_status_form_dict для отображения в шаблоне
+                        order_status_form_dict[int(order_id)] = status_form # Обновляем форму в словаре, чтобы показать ошибки
+                        # messages.error(request, f'Ошибка изменения статуса заказа #{order_id}.')
+            # Если не админ, можно вернуть HttpResponseForbidden или проигнорировать
+        elif action == 'toggle_trust':
+            if current_user.is_staff or current_user.is_superuser:
+                user_id_to_toggle = request.POST.get('user_id') # ID пользователя, чей статус меняем (в данном случае, это user_profile_to_display.id)
+                if user_id_to_toggle:
+                    try:
+                        user_to_toggle = User.objects.get(pk=user_id_to_toggle)
+                        user_to_toggle.isTrusted = not user_to_toggle.isTrusted
+                        user_to_toggle.save()
+                        # messages.success(request, f'Статус доверия для пользователя {user_to_toggle.username} изменен.')
+                    except User.DoesNotExist:
+                        # messages.error(request, 'Пользователь для изменения статуса доверия не найден.')
+                        pass # Обработка ошибки, если пользователь не найден
+                return redirect('profile')
+            # Если не админ, можно вернуть HttpResponseForbidden или проигнорировать
+
+        # После обработки POST, если не было redirect, нужно подготовить форму профиля для отображения (возможно, с ошибками)
+        profile_form = UserProfileEditForm(request.POST if action == 'save_profile' else None, instance=current_user)
+
+    else: # Если метод GET
+        profile_form = UserProfileEditForm(instance=current_user)
 
     context = {
-        'form': form,
-        'user_orders': user_orders, # Передаем заказы в контекст
-        'user_bookings': user_bookings, # Передаем бронирования в контекст
+        'form': profile_form, # Эта переменная теперь всегда содержит актуальную форму профиля
+        'user_profile_to_display': user_profile_to_display, # Пользователь, чей профиль отображается
+        'user_orders': user_orders,
+        'user_bookings': user_bookings,
+        'admin_all_orders': admin_all_orders,
+        'order_status_form_dict': order_status_form_dict,
+        'order_filter_form': order_filter_form,
         'yandex_maps_api_key': settings.YANDEX_MAPS_API_KEY,
     }
     return render(request, 'main/profile.html', context)
+
+
+
+
+class AdminOrderFilterForm(forms.Form):
+    status = forms.ChoiceField(choices=[('', 'Все статусы')] + Order.STATUS_CHOICES, required=False, label="Статус")
+    category = forms.ModelChoiceField(queryset=Category.objects.all(), required=False, label="Категория", empty_label="Все категории")
+    date_from = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), required=False, label="Дата от")
+    date_to = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), required=False, label="Дата до")
+    search_query = forms.CharField(required=False, label="Поиск (ID, Имя пользователя, Название услуги)")
+
 
 # --- Представление для генерации PDF отчета ---
 @login_required

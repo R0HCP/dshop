@@ -88,20 +88,34 @@ class Service(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='approved')
     moderated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='moderated_services') 
     moderated_at = models.DateTimeField(null=True, blank=True) 
+    agreement_document = models.FileField(upload_to='agreements/', null=True, blank=True, verbose_name="Документ договора") 
     
     def __str__(self):
         return self.title
     
 class Order(models.Model):  
+    STATUS_CHOICES = [
+        ('pending', 'В ожидании'),
+        ('processing', 'В обработке'),
+        ('shipped', 'Отправлен'),
+        ('delivered', 'Доставлен'),
+        ('cancelled', 'Отменен'),
+    ]
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     service = models.ForeignKey(Service, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)
     estimated_completion_date = models.DateField(null=True, blank=True) 
-     
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='pending', # Статус по умолчанию
+        verbose_name="Статус заказа"
+    )
+
     def __str__(self):
-        return f"Заказ #{self.id} от {self.user.username}"
+        return f"Заказ #{self.id} от {self.user.username} ({self.get_status_display()})" # Используем get_status_display() для читаемого статуса
 
 class Transaction(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

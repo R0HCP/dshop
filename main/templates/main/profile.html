@@ -1,5 +1,6 @@
 {% extends 'main/base.html' %}
-{% load widget_tweaks %} {# Загружаем теги widget_tweaks #}
+{% load widget_tweaks %}
+{% load main_extras %} {# Загружаем наш кастомный тег get_item #}
 
 {% block title %}Личный кабинет{% endblock %}
 
@@ -22,58 +23,65 @@
     <div class="row">
         {# Колонка для формы редактирования профиля и карты #}
         <div class="col-lg-7 mb-4 mb-lg-0">
-            <h3>Редактировать профиль</h3>
-            <form method="post" enctype="multipart/form-data" novalidate>
-                {% csrf_token %}
-
-                {# Отображение фото профиля #}
-                <div class="mb-3 text-center">
-                    {% if user.pfp %}
-                        <img class="img-thumbnail rounded-circle mb-2" src="{{ user.pfp.url }}" alt="Фото профиля" style="width: 150px; height: 150px; object-fit: cover;">
-                    {% else %}
-                        <i class="bi bi-person-circle" style="font-size: 10rem; color: var(--bs-secondary-color);"></i>
-                        <p class="text-muted">Фото не загружено</p>
-                    {% endif %}
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="mb-0">Редактировать профиль</h3>
                 </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data" novalidate>
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="save_profile"> {# Указываем действие #}
 
-                {# Рендеринг полей формы с widget_tweaks #}
-                {% for field in form.visible_fields %}
-                    <div class="mb-3">
-                        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                        {% if field.errors %}
-                            {% render_field field class+="form-control is-invalid" %}
-                            <div class="invalid-feedback d-block">
-                                {{ field.errors }}
+                        {# Отображение фото профиля #}
+                        <div class="mb-3 text-center">
+                            {% if user.pfp %}
+                                <img class="img-thumbnail rounded-circle mb-2" src="{{ user.pfp.url }}" alt="Фото профиля" style="width: 150px; height: 150px; object-fit: cover;">
+                            {% else %}
+                                <i class="bi bi-person-circle" style="font-size: 10rem; color: var(--bs-secondary-color);"></i>
+                                <p class="text-muted">Фото не загружено</p>
+                            {% endif %}
+                        </div>
+
+                        {# Рендеринг полей формы с widget_tweaks #}
+                        {% for field in form.visible_fields %}
+                            <div class="mb-3">
+                                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                                {% if field.errors %}
+                                    {% render_field field class+="form-control is-invalid" %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ field.errors }}
+                                    </div>
+                                {% else %}
+                                    {% render_field field class+="form-control" %}
+                                {% endif %}
+                                {% if field.help_text %}
+                                    <div class="form-text">{{ field.help_text }}</div>
+                                {% endif %}
                             </div>
-                        {% else %}
-                            {% render_field field class+="form-control" %}
-                        {% endif %}
-                        {% if field.help_text %}
-                            <div class="form-text">{{ field.help_text }}</div>
-                        {% endif %}
-                    </div>
-                {% endfor %}
-                 {# Скрытые поля (если есть) #}
-                {% for hidden in form.hidden_fields %}
-                    {{ hidden }}
-                {% endfor %}
+                        {% endfor %}
+                         {# Скрытые поля (если есть) #}
+                        {% for hidden in form.hidden_fields %}
+                            {{ hidden }}
+                        {% endfor %}
 
-                <hr class="my-4">
+                        <hr class="my-4">
 
-                {# Карта для выбора местоположения #}
-                <h3>Местоположение офиса</h3>
-                <div id="profile_yandex_map" style="width: 100%; height: 300px;" class="mb-3"></div>
-                {# Скрытые поля для координат #}
-                <input type="hidden" id="office_latitude" name="office_latitude" value="{{ form.instance.office_latitude|default_if_none:'' }}">
-                <input type="hidden" id="office_longitude" name="office_longitude" value="{{ form.instance.office_longitude|default_if_none:'' }}">
+                        {# Карта для выбора местоположения #}
+                        <h4 class="mb-3">Местоположение офиса</h4>
+                        <div id="profile_yandex_map" style="width: 100%; height: 300px;" class="mb-3 border rounded"></div>
+                        {# Скрытые поля для координат #}
+                        <input type="hidden" id="office_latitude" name="office_latitude" value="{{ form.instance.office_latitude|default_if_none:'' }}">
+                        <input type="hidden" id="office_longitude" name="office_longitude" value="{{ form.instance.office_longitude|default_if_none:'' }}">
 
-                <button type="submit" class="btn btn-primary w-100">Сохранить изменения</button>
-            </form>
+                        <button type="submit" name="save_profile" class="btn btn-primary w-100">Сохранить изменения профиля</button>
+                    </form>
+                </div>
+            </div>
         </div>
 
-        {# Колонка для заказов и записей на консультации #}
+        {# Колонка для заказов пользователя и записей на консультации #}
         <div class="col-lg-5">
-            {# Мои заказы #}
+            {# Мои заказы пользователя #}
             <div class="card mb-4">
                 <div class="card-header">
                     <h3 class="mb-0">Мои заказы</h3>
@@ -88,6 +96,7 @@
                                         <small class="text-muted">{{ order.created_at|date:"d.m.Y" }}</small>
                                     </div>
                                     <p class="mb-1">Сумма: {{ order.total_price }} ₽</p>
+                                    <p class="mb-1">Статус: <span class="badge bg-info text-dark">{{ order.get_status_display }}</span></p>
                                     {% if order.estimated_completion_date %}
                                         <small class="text-muted">Ожид. выполнение: {{ order.estimated_completion_date|date:"d.m.Y" }}</small>
                                     {% endif %}
@@ -103,7 +112,7 @@
                 </div>
             </div>
 
-            {# Мои записи на консультации #}
+            {# Мои записи на консультации пользователя #}
             <div class="card">
                 <div class="card-header">
                     <h3 class="mb-0">Мои записи на консультации</h3>
@@ -124,34 +133,139 @@
                 </div>
             </div>
 
-            {# Блок администратора для изменения статуса доверия #}
-            {% if request.user.is_staff or request.user.is_superuser %}
-            <div class="card mt-4 bg-light border-warning">
-                 <div class="card-header">
-                     <h4 class="mb-0 text-warning">Панель администратора</h4>
-                 </div>
-                 <div class="card-body">
-                    <h5 class="card-title">Изменить статус доверия</h5>
-                    <form method="post" action="{% url 'toggle_trusted' %}">
-                        {% csrf_token %}
-                        <input type="hidden" name="user_id" value="{{ user.id }}">
-                        <button type="submit" class="btn btn-warning">{% if user.isTrusted %}Снять доверие{% else %}Сделать доверенным{% endif %}</button>
-                    </form>
-                    <p class="card-text mt-2"><small><strong>Внимание:</strong> Эта опция видна только администраторам.</small></p>
-                </div>
-            </div>
-            {% endif %}
-
         </div>
     </div>
 
-    <div class="text-center mt-4">
+    {# Раздел для администратора: Все заказы и управление доверием #}
+    {% if user.is_staff or user.is_superuser %}
+    <hr class="my-5">
+    <div class="admin-section">
+        <h2 class="text-center mb-4">Панель администратора</h2>
+        <div class="row">
+            <div class="col-12">
+                {# Управление заказами #}
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h3 class="mb-0">Управление всеми заказами</h3>
+                    </div>
+                    <div class="card-body">
+                        {# Форма фильтрации заказов #}
+                        <form method="get" class="mb-4">
+                            <div class="row g-3 align-items-end">
+                                <div class="col-md-3">
+                                    <label for="{{ order_filter_form.status.id_for_label }}" class="form-label">{{ order_filter_form.status.label }}</label>
+                                    {% render_field order_filter_form.status class+="form-select form-select-sm" %}
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="{{ order_filter_form.category.id_for_label }}" class="form-label">{{ order_filter_form.category.label }}</label>
+                                    {% render_field order_filter_form.category class+="form-select form-select-sm" %}
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="{{ order_filter_form.date_from.id_for_label }}" class="form-label">{{ order_filter_form.date_from.label }}</label>
+                                    {% render_field order_filter_form.date_from class+="form-control form-control-sm" %}
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="{{ order_filter_form.date_to.id_for_label }}" class="form-label">{{ order_filter_form.date_to.label }}</label>
+                                    {% render_field order_filter_form.date_to class+="form-control form-control-sm" %}
+                                </div>
+                                <div class="col-md-2">
+                                    <button type="submit" class="btn btn-primary btn-sm w-100">Применить</button>
+                                </div>
+                                <div class="col-12 mt-2">
+                                     <label for="{{ order_filter_form.search_query.id_for_label }}" class="form-label">{{ order_filter_form.search_query.label }}</label>
+                                     {% render_field order_filter_form.search_query class+="form-control form-control-sm" placeholder="ID, клиент, услуга..." %}
+                                </div>
+                                 {% if request.GET.status or request.GET.category or request.GET.date_from or request.GET.date_to or request.GET.search_query %}
+                                <div class="col-12 mt-2">
+                                    <a href="{% url 'profile' %}" class="btn btn-outline-secondary btn-sm">Сбросить фильтры</a>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </form>
+
+                        {% if admin_all_orders %}
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover table-bordered table-sm">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Клиент</th>
+                                            <th>Услуга</th>
+                                            <th>Кол-во</th>
+                                            <th>Сумма</th>
+                                            <th>Дата</th>
+                                            <th>Статус</th>
+                                            <th style="width: 200px;">Изменить статус</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for order in admin_all_orders %}
+                                        <tr>
+                                            <td>{{ order.id }}</td>
+                                            <td><a href="{% url 'seller_detail' order.user.id %}">{{ order.user.username }}</a></td>
+                                            <td><a href="{% url 'service_detail' order.service.id %}">{{ order.service.title }}</a></td>
+                                            <td>{{ order.quantity }}</td>
+                                            <td>{{ order.total_price }} ₽</td>
+                                            <td>{{ order.created_at|date:"d.m.Y H:i" }}</td>
+                                            <td><span class="badge 
+                                                {% if order.status == 'pending' %}bg-warning text-dark
+                                                {% elif order.status == 'processing' %}bg-info text-dark
+                                                {% elif order.status == 'shipped' %}bg-primary
+                                                {% elif order.status == 'delivered' %}bg-success
+                                                {% elif order.status == 'cancelled' %}bg-danger
+                                                {% else %}bg-secondary
+                                                {% endif %}">{{ order.get_status_display }}</span></td>
+                                            <td>
+                                                <form method="post" class="d-flex">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="order_id" value="{{ order.id }}">
+                                                    <input type="hidden" name="action" value="change_order_status"> {# Указываем действие #}
+                                                    {% with status_form=order_status_form_dict|get_item:order.id %}
+                                                        {% render_field status_form.status class+="form-select form-select-sm me-2" %}
+                                                    {% endwith %}
+                                                    <button type="submit" name="change_order_status" class="btn btn-sm btn-outline-info">ОК</button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <p class="text-center">Нет заказов для отображения по выбранным фильтрам.</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {# Управление доверием пользователей #}
+                <div class="card mt-4 bg-light border-warning">
+                     <div class="card-header">
+                         <h4 class="mb-0 text-warning">Управление доверием пользователя</h4>
+                     </div>
+                     <div class="card-body">
+                        <h5 class="card-title">Изменить статус доверия для <i>{{ user.username }}</i></h5>
+                        <form method="post" action="{% url 'toggle_trusted' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="user_id" value="{{ user.id }}">
+                            <input type="hidden" name="action" value="toggle_trust"> {# Указываем действие #}
+                            <button type="submit" name="toggle_trust" class="btn btn-warning">{% if user.isTrusted %}Снять доверие{% else %}Сделать доверенным{% endif %}</button>
+                        </form>
+                        <p class="card-text mt-2"><small><strong>Внимание:</strong> Эта опция изменяет статус текущего просматриваемого профиля (если это вы, то ваш собственный).</small></p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    {% endif %} {# Конец блока для администратора #}
+
+    <div class="text-center mt-5 mb-4">
          <a href="/" class="btn btn-secondary">Вернуться на главную страницу</a>
     </div>
 
 </div>
 
-{# JavaScript для карты вынесен в конец блока, чтобы HTML был загружен #}
+{# JavaScript для карты (остается без изменений) #}
 <script src="https://api-maps.yandex.ru/2.1/?apikey={{ yandex_maps_api_key }}&lang=ru_RU" type="text/javascript"></script>
 <script type="text/javascript">
     ymaps.ready(init);
@@ -160,16 +274,14 @@
         var latitudeInput = document.getElementById('office_latitude');
         var longitudeInput = document.getElementById('office_longitude');
 
-        // Используем default_if_none для корректной обработки None из Django
         var initialLatStr = "{{ form.instance.office_latitude|default_if_none:'' }}";
         var initialLonStr = "{{ form.instance.office_longitude|default_if_none:'' }}";
 
         var initialLatitude = null;
         var initialLongitude = null;
-        var defaultLatitude = 53.9; // Минск по умолчанию
+        var defaultLatitude = 53.9;
         var defaultLongitude = 27.5667;
 
-        // Преобразуем строки в числа, если они не пустые
         if (initialLatStr) {
             initialLatitude = parseFloat(initialLatStr);
         }
@@ -177,15 +289,10 @@
             initialLongitude = parseFloat(initialLonStr);
         }
 
-        // Проверяем, удалось ли распарсить, иначе используем дефолтные значения
         if (initialLatitude === null || isNaN(initialLatitude) || initialLongitude === null || isNaN(initialLongitude)) {
-            console.warn("Не удалось получить начальные координаты, используются значения по умолчанию.");
             initialLatitude = defaultLatitude;
             initialLongitude = defaultLongitude;
         }
-
-        console.log("Используемая начальная широта:", initialLatitude);
-        console.log("Используемая начальная долгота:", initialLongitude);
 
         var myMap = new ymaps.Map('profile_yandex_map', {
             center: [initialLatitude, initialLongitude],
@@ -211,7 +318,6 @@
             var coords = placemark.geometry.getCoordinates();
             latitudeInput.value = coords[0].toFixed(9);
             longitudeInput.value = coords[1].toFixed(9);
-            console.log("DragEnd Coords:", coords[0].toFixed(9), coords[1].toFixed(9));
         });
 
         myMap.events.add('click', function (e) {
@@ -219,7 +325,6 @@
             placemark.geometry.setCoordinates(coords);
             latitudeInput.value = coords[0].toFixed(9);
             longitudeInput.value = coords[1].toFixed(9);
-            console.log("Click Coords:", coords[0].toFixed(9), coords[1].toFixed(9));
         });
     }
 </script>

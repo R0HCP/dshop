@@ -1,10 +1,23 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from .models import User, Service, Order, ConsultationSlot
+from .models import User, Service, Order, ConsultationSlot, Category 
 import datetime
 
 
+class AdminOrderFilterForm(forms.Form):
+    status = forms.ChoiceField(choices=[('', 'Все статусы')] + Order.STATUS_CHOICES, required=False, label="Статус заказа")
+    category = forms.ModelChoiceField(queryset=Category.objects.all(), required=False, label="Категория услуги", empty_label="Все категории")
+    date_from = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), required=False, label="Дата заказа от")
+    date_to = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), required=False, label="Дата заказа до")
+    search_query = forms.CharField(required=False, label="Поиск (ID заказа, имя клиента, название услуги)")
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['status'].widget.attrs.update({'class': 'form-select form-select-sm'})
+        self.fields['category'].widget.attrs.update({'class': 'form-select form-select-sm'})
+        self.fields['date_from'].widget.attrs.update({'class': 'form-control form-control-sm'})
+        self.fields['date_to'].widget.attrs.update({'class': 'form-control form-control-sm'})
+        self.fields['search_query'].widget.attrs.update({'class': 'form-control form-control-sm', 'placeholder': 'ID, клиент, услуга...'})
 
 
 class DateRangeForm(forms.Form):
@@ -90,15 +103,21 @@ class CustomAuthenticationForm(AuthenticationForm):
 class AddServiceForm(forms.ModelForm):
     class Meta:
         model = Service
-        fields = ['category', 'images', 'title', 'description', 'price', 'quantity', 'execution_time_days'] 
+        fields = ['category', 'images', 'title', 'description', 'price', 'quantity', 'execution_time_days', 'agreement_document']
 
 class EditServiceForm(forms.ModelForm):
     class Meta:
         model = Service
-        fields = ['category', 'images', 'title', 'description', 'price', 'isAvaliable', 'quantity', 'execution_time_days'] # <--- Добавлено execution_time_days
+        fields = ['category', 'images', 'title', 'description', 'price', 'isAvaliable', 'quantity', 'execution_time_days', 'agreement_document']# <--- Добавлено execution_time_days
 
 class OrderServiceForm(forms.Form):
     quantity = forms.IntegerField(min_value=1, initial=1)
+
+
+class AdminOrderStatusForm(forms.ModelForm):
+    class Meta:
+        model = Order
+        fields = ['status']
 
 
 class UserProfileEditForm(forms.ModelForm):
