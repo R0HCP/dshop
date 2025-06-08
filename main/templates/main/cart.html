@@ -31,7 +31,7 @@
                         {% endif %}
                         <div>
                             <h5 class="mb-1"><a href="{% url 'service_detail' item.service.id %}" class="text-decoration-none">{{ item.service.title }}</a></h5>
-                            <p class="mb-1 text-muted">Цена за единицу: {{ item.service.price }} ₽</p>
+                            <p class="mb-1 text-muted">Цена за единицу: {{ item.service.price }} Br</p>
                         </div>
                     </div>
                 </div>
@@ -50,7 +50,7 @@
                         </div>
                         {# Итоговая цена за позицию #}
                         <div class="col-lg-4 col-md-3 text-md-end mb-2 mb-md-0">
-                            <span class="fw-bold">{{ item.total_price }} ₽</span>
+                            <span class="fw-bold">{{ item.total_price }} Br</span>
                         </div>
                         {# Кнопка удаления #}
                         <div class="col-lg-3 col-md-3 text-md-end">
@@ -64,7 +64,7 @@
 
         {# Итоговая стоимость #}
         <div class="d-flex justify-content-end mb-4">
-            <h4>Итоговая стоимость: <span class="fw-bold">{{ total_price }} ₽</span></h4>
+            <h4>Итоговая стоимость: <span class="fw-bold">{{ total_price }} Br</span></h4>
         </div>
 
         {# Кнопки действий #}
@@ -74,7 +74,7 @@
                  <a href="/" class="btn btn-outline-secondary">Продолжить покупки</a>
              </div>
              <div>
-                 <a href="{% url 'checkout' %}" class="btn btn-primary btn-lg">Оформить заказ</a> {# Кнопка побольше #}
+                 <a href="{% url 'checkout' %}" class="btn btn-primary btn-lg">Оформить заявку</a> {# Кнопка побольше #}
              </div>
         </div>
 

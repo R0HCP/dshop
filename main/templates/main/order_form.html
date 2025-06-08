@@ -1,17 +1,17 @@
 {% extends 'main/base.html' %}
 
-{% block title %}Заказ услуги "{{ service.title }}"{% endblock %}
+{% block title %} Заявка {{ service.title }}"{% endblock %}
 
 {% block content %}
     <div class="container">
-        <h2 class="mt-4">Заказ услуги "{{ service.title }}"</h2>
+        <h2 class="mt-4">Заявка на услуги "{{ service.title }}"</h2>
         <p>Цена за единицу: {{ service.price }}</p>
         <form method="post" class="some-form">
             {% csrf_token %}
             <div class="mb-3">
                 {{ form.as_p }}
             </div>
-            <button type="submit" class="btn btn-primary">Заказать</button>
+            <button type="submit" class="btn btn-primary">Офорить </button>
         </form>
     </div>
 {% endblock %}

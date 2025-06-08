@@ -24,27 +24,27 @@
         <div class="row justify-content-center">
             <div class="col-lg-8"> {# Ограничиваем ширину для лучшей читаемости #}
 
-                <h4 class="mb-3">Ваш заказ:</h4>
+                <h4 class="mb-3">Ваша заявка:</h4>
                 <ul class="list-group mb-4">
                     {% for item in cart_items %}
                     <li class="list-group-item d-flex justify-content-between lh-sm">
                         <div>
                             <h6 class="my-0">{{ item.service.title }} (x{{ item.quantity }})</h6>
-                            <small class="text-muted">Цена за ед.: {{ item.service.price }} ₽</small>
+                            <small class="text-muted">Цена за ед.: {{ item.service.price }} Br</small>
                         </div>
-                        <span class="text-muted">{{ item.total_price }} ₽</span>
+                        <span class="text-muted">{{ item.total_price }} Br</span>
                     </li>
                     {% endfor %}
                     <li class="list-group-item d-flex justify-content-between bg-light">
                         <span class="fw-bold">Итого:</span>
-                        <strong class="fw-bold">{{ total_price }} ₽</strong>
+                        <strong class="fw-bold">{{ total_price }} Br</strong>
                     </li>
                 </ul>
 
-                {# Форма подтверждения заказа #}
+                {# Форма подтверждения заявки #}
                 <form method="post" class="text-center">
                     {% csrf_token %}
-                    <button type="submit" class="btn btn-primary btn-lg">Подтвердить и оформить заказ</button>
+                    <button type="submit" class="btn btn-primary btn-lg">Подтвердить и оформить заявку</button>
                 </form>
 
                 <div class="text-center mt-3">

@@ -44,7 +44,7 @@
                             <td><a href="{% url 'service_detail' service.id %}">{{ service.title }}</a></td>
                             <td>{% if service.category %}{{ service.category.name }}{% else %}Нет категории{% endif %}</td>
                             <td><a href="{% url 'seller_detail' service.user.id %}">{{ service.user.username }}</a></td>
-                            <td>{{ service.price }} ₽</td> {# Добавим знак рубля для наглядности #}
+                            <td>{{ service.price }} Br</td> {# Добавим знак рубля для наглядности #}
                             <td class="text-center"> {# Центрируем кнопку #}
                                 <form method="post" action="{% url 'add_to_cart' service.id %}">
                                     {% csrf_token %}

@@ -292,13 +292,13 @@ def profile_view(request):
                     status_form = AdminOrderStatusForm(request.POST, instance=order_to_update, prefix=f"order-{order_id}")
                     if status_form.is_valid():
                         status_form.save()
-                        # messages.success(request, f'Статус заказа #{order_id} успешно изменен.')
+                        # messages.success(request, f'Статус заявки #{order_id} успешно изменен.')
                         return redirect('profile')
                     else:
                         # Если форма статуса невалидна, нужно как-то обработать ошибку
                         # Например, добавить ее в order_status_form_dict для отображения в шаблоне
                         order_status_form_dict[int(order_id)] = status_form # Обновляем форму в словаре, чтобы показать ошибки
-                        # messages.error(request, f'Ошибка изменения статуса заказа #{order_id}.')
+                        # messages.error(request, f'Ошибка изменения статуса заявки #{order_id}.')
             # Если не админ, можно вернуть HttpResponseForbidden или проигнорировать
         elif action == 'toggle_trust':
             if current_user.is_staff or current_user.is_superuser:
@@ -680,9 +680,9 @@ def order_service_view(request, service_id):
 
                 try: # Оборачиваем сохранение в try-except для отладки ошибок
                     order.save()
-                    print("Заказ успешно сохранен с датой выполнения.") # Отладка
+                    print("Заявка успешно сохранен с датой выполнения.") # Отладка
                 except Exception as e:
-                    print(f"Ошибка при сохранении заказа: {e}") # Отладка
+                    print(f"Ошибка при сохранении заявки  {e}") # Отладка
 
                 return render(request, 'main/order_success.html', {'order_id': order.id, 'seller': service.user, 'completion_date': estimated_completion_date})
             else:
@@ -812,13 +812,15 @@ def toggle_trusted_from_service_view(request, user_id):
 def register_view(request):
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
-        if form.is_valid():
+        if form.is_valid(): # Если форма НЕ валидна, блок if не выполнится
             user = form.save()
             login(request, user)
             return redirect('index')
+        # Если form.is_valid() == False, Django автоматически добавит ошибки в form.errors
+        # и мы просто рендерим шаблон снова с этой же формой (которая теперь содержит ошибки)
     else:
         form = CustomUserCreationForm()
-    return render(request, 'main/register.html', {'form': form})
+    return render(request, 'main/register.html', {'form': form}) # Передаем форму с ошибками (если они есть)
 
 def login_view(request):
     if request.method == 'POST':
@@ -965,17 +967,38 @@ def remove_from_cart(request, service_id):
     return redirect('view_cart')
 
 def update_cart_quantity(request, service_id):
-    quantity = int(request.POST.get('quantity', 1))
-    if quantity < 1:
-        return remove_from_cart(request, service_id)
+    # ----- НАЧАЛО ОТЛАДКИ -----
+    print(f"--- Обновление количества в КОРЗИНЕ: service_id={service_id} ---")
+    print(f"Метод запроса: {request.method}")
+    print(f"Данные POST: {request.POST}")
+    # ----- КОНЕЦ ОТЛАДКИ -----
 
-    cart = request.session.get('cart', {})
+    if request.method == 'POST': # Обрабатываем только POST
+        quantity_str = request.POST.get('quantity', '1') # Получаем новое количество из POST
+        try:
+            quantity = int(quantity_str)
+            if quantity < 1: # Если количество < 1, удаляем товар
+                print(f"Количество < 1 ({quantity}), вызываем remove_from_cart для service_id={service_id}")
+                return remove_from_cart(request, service_id)
+        except ValueError:
+            print(f"Не удалось преобразовать quantity='{quantity_str}' в int, устанавливаем 1")
+            quantity = 1 # Если не удалось преобразовать, ставим 1 (или можно вернуть ошибку/не менять)
 
-    if service_id in cart:
-        cart[service_id] = quantity
-        request.session['cart'] = cart
+        print(f"Обработанное количество для обновления: {quantity}") # Отладка
 
-    return redirect('view_cart')
+        cart = request.session.get('cart', {})
+        print(f"Корзина ДО обновления количества: {cart}") # Отладка
+        service_id_str = str(service_id)
+
+        if service_id_str in cart:
+            cart[service_id_str] = quantity # Обновляем количество услуги в корзине
+            request.session['cart'] = cart
+            request.session.modified = True # Явно помечаем сессию как измененную
+            print(f"Корзина ПОСЛЕ обновления количества: {request.session.get('cart')}") # Отладка
+        else:
+            print(f"Ключ {service_id_str} не найден в корзине для обновления количества.")
+
+    return redirect('view_cart') # Перенаправляем на страницу корзины в любом случае (или обрабатываем ошибки иначе)
 
 def clear_cart(request):
     if 'cart' in request.session:
@@ -1065,3 +1088,4 @@ def checkout_view(request):
         'errors': errors,
     }
     return render(request, 'main/checkout.html', context)
+

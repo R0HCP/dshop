@@ -142,7 +142,7 @@
                             <p><a href="{% url 'service_consultation' service.id %}">Записаться</a></p> 
                         {% else %}
                             <div class="alert alert-info" role="alert">
-                                Для заказа необходимо <a href="{% url 'login' %}?next={{ request.path }}" class="alert-link">войти</a> или <a href="{% url 'register' %}?next={{ request.path }}" class="alert-link">зарегистрироваться</a>.
+                                Для заявки необходимо <a href="{% url 'login' %}?next={{ request.path }}" class="alert-link">войти</a> или <a href="{% url 'register' %}?next={{ request.path }}" class="alert-link">зарегистрироваться</a>.
                             </div>
                         {% endif %}
                     {% else %}

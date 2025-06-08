@@ -33,8 +33,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     dateregister = models.DateTimeField(auto_now_add=True)
     isTrusted = models.BooleanField(default=False)
     pfp = models.ImageField(upload_to='pfp/', null=True, blank=True)
-    office_latitude = models.FloatField(null=True, blank=True, verbose_name="Широта офиса") 
-    office_longitude = models.FloatField(null=True, blank=True, verbose_name="Долгота офиса")
+    office_latitude = models.FloatField(null=True, blank=True, verbose_name="Широта расположения офиса") 
+    office_longitude = models.FloatField(null=True, blank=True, verbose_name="Долгота расположения офиса")
 
     USERNAME_FIELD = 'username' # 
     REQUIRED_FIELDS = [] 
@@ -111,11 +111,11 @@ class Order(models.Model):
         max_length=20,
         choices=STATUS_CHOICES,
         default='pending', # Статус по умолчанию
-        verbose_name="Статус заказа"
+        verbose_name="Статус Заявки" 
     )
 
     def __str__(self):
-        return f"Заказ #{self.id} от {self.user.username} ({self.get_status_display()})" # Используем get_status_display() для читаемого статуса
+        return f"Заявка #{self.id} от {self.user.username} ({self.get_status_display()})" # Используем get_status_display() для читаемого статуса
 
 class Transaction(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

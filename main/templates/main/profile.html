@@ -84,7 +84,7 @@
             {# Мои заказы пользователя #}
             <div class="card mb-4">
                 <div class="card-header">
-                    <h3 class="mb-0">Мои заказы</h3>
+                    <h3 class="mb-0">Мои заявки</h3>
                 </div>
                 <div class="card-body">
                     {% if user_orders %}
@@ -95,7 +95,7 @@
                                         <h6 class="mb-1"><a href="{% url 'service_detail' order.service.id %}">{{ order.service.title }}</a> (x{{ order.quantity }})</h6>
                                         <small class="text-muted">{{ order.created_at|date:"d.m.Y" }}</small>
                                     </div>
-                                    <p class="mb-1">Сумма: {{ order.total_price }} ₽</p>
+                                    <p class="mb-1">Сумма: {{ order.total_price }} Br</p>
                                     <p class="mb-1">Статус: <span class="badge bg-info text-dark">{{ order.get_status_display }}</span></p>
                                     {% if order.estimated_completion_date %}
                                         <small class="text-muted">Ожид. выполнение: {{ order.estimated_completion_date|date:"d.m.Y" }}</small>
@@ -205,7 +205,7 @@
                                             <td><a href="{% url 'seller_detail' order.user.id %}">{{ order.user.username }}</a></td>
                                             <td><a href="{% url 'service_detail' order.service.id %}">{{ order.service.title }}</a></td>
                                             <td>{{ order.quantity }}</td>
-                                            <td>{{ order.total_price }} ₽</td>
+                                            <td>{{ order.total_price }} Br</td>
                                             <td>{{ order.created_at|date:"d.m.Y H:i" }}</td>
                                             <td><span class="badge 
                                                 {% if order.status == 'pending' %}bg-warning text-dark

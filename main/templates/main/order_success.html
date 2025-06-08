@@ -1,15 +1,15 @@
 {% extends 'main/base.html' %}
 
-{% block title %}Заказ успешно оформлен{% endblock %}
+{% block title %}Заявка успешно оформлен{% endblock %}
 
 {% block content %}
     <div class="alert alert-success" role="alert">
-        <h2 class="alert-heading">Заказ успешно оформлен!</h2>
-        <p>Номер вашего заказа: {{ order_id }}</p>
-        <p>Спасибо за ваш заказ!</p>
+        <h2 class="alert-heading">Заявка успешно оформлен!</h2>
+        <p>Номер вашей заявки  {{ order_id }}</p>
+        <p>Спасибо за ваш заявку!</p>
 
         {% if completion_date %}
-            <p>Ориентировочная дата выполнения заказа: <strong>{{ completion_date }}</strong></p>
+            <p>Ориентировочная дата выполнения заявки  <strong>{{ completion_date }}</strong></p>
         {% endif %}
     </div>
 

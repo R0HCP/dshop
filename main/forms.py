@@ -7,9 +7,9 @@ import datetime
 class AdminOrderFilterForm(forms.Form):
     status = forms.ChoiceField(choices=[('', 'Все статусы')] + Order.STATUS_CHOICES, required=False, label="Статус заказа")
     category = forms.ModelChoiceField(queryset=Category.objects.all(), required=False, label="Категория услуги", empty_label="Все категории")
-    date_from = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), required=False, label="Дата заказа от")
-    date_to = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), required=False, label="Дата заказа до")
-    search_query = forms.CharField(required=False, label="Поиск (ID заказа, имя клиента, название услуги)")
+    date_from = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), required=False, label="Дата заявки от")
+    date_to = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), required=False, label="Дата заявки до")
+    search_query = forms.CharField(required=False, label="Поиск (ID заявки, имя клиента, название услуги)")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
