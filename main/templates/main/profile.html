@@ -84,22 +84,38 @@
             {# Мои заказы пользователя #}
             <div class="card mb-4">
                 <div class="card-header">
-                    <h3 class="mb-0">Мои заявки</h3>
+                    <h3 class="mb-0">Мои заявки</h3> {# Было Мои заказы #}
                 </div>
                 <div class="card-body">
                     {% if user_orders %}
                         <ul class="list-group list-group-flush">
                             {% for order in user_orders %}
                                 <li class="list-group-item">
-                                    <div class="d-flex w-100 justify-content-between">
-                                        <h6 class="mb-1"><a href="{% url 'service_detail' order.service.id %}">{{ order.service.title }}</a> (x{{ order.quantity }})</h6>
-                                        <small class="text-muted">{{ order.created_at|date:"d.m.Y" }}</small>
+                                    <div class="d-flex w-100 justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-1">
+                                                {% if order.service %}
+                                                    <a href="{% url 'service_detail' order.service.id %}">{{ order.service.title }}</a>
+                                                {% else %}
+                                                    <span class="text-danger">Услуга удалена</span>
+                                                {% endif %}
+                                                (x{{ order.quantity }})
+                                            </h6>
+                                            <p class="mb-1">Сумма: {{ order.total_price }} Br</p> {# Было Руб. #}
+                                            <p class="mb-1">Статус: <span class="badge bg-info text-dark">{{ order.get_status_display }}</span></p>
+                                            {% if order.estimated_completion_date %}
+                                                <small class="text-muted">Ожид. выполнение: {{ order.estimated_completion_date|date:"d.m.Y" }}</small>
+                                            {% endif %}
+                                        </div>
+                                        <div class="text-nowrap">
+                                            <small class="text-muted d-block mb-1">{{ order.created_at|date:"d.m.Y" }}</small>
+                                            {% if order.id %} {# Проверка, что ID заказа существует #}
+                                            <a href="{% url 'view_agreement' order.id %}" class="btn btn-sm btn-outline-secondary" title="Посмотреть детали заказа/договор">
+                                                <i class="bi bi-file-text"></i> Договор
+                                            </a>
+                                            {% endif %}
+                                        </div>
                                     </div>
-                                    <p class="mb-1">Сумма: {{ order.total_price }} Br</p>
-                                    <p class="mb-1">Статус: <span class="badge bg-info text-dark">{{ order.get_status_display }}</span></p>
-                                    {% if order.estimated_completion_date %}
-                                        <small class="text-muted">Ожид. выполнение: {{ order.estimated_completion_date|date:"d.m.Y" }}</small>
-                                    {% endif %}
                                 </li>
                             {% endfor %}
                         </ul>
@@ -132,7 +148,6 @@
                     {% endif %}
                 </div>
             </div>
-
         </div>
     </div>
 
@@ -196,6 +211,7 @@
                                             <th>Дата</th>
                                             <th>Статус</th>
                                             <th style="width: 200px;">Изменить статус</th>
+                                            <th>Договор</th> {# Новый столбец для ссылки на договор #}
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -203,11 +219,17 @@
                                         <tr>
                                             <td>{{ order.id }}</td>
                                             <td><a href="{% url 'seller_detail' order.user.id %}">{{ order.user.username }}</a></td>
-                                            <td><a href="{% url 'service_detail' order.service.id %}">{{ order.service.title }}</a></td>
+                                            <td>
+                                                {% if order.service %}
+                                                    <a href="{% url 'service_detail' order.service.id %}">{{ order.service.title }}</a>
+                                                {% else %}
+                                                    <span class="text-danger">Услуга удалена</span>
+                                                {% endif %}
+                                            </td>
                                             <td>{{ order.quantity }}</td>
-                                            <td>{{ order.total_price }} Br</td>
+                                            <td>{{ order.total_price }} Br</td> {# Было Руб. #}
                                             <td>{{ order.created_at|date:"d.m.Y H:i" }}</td>
-                                            <td><span class="badge 
+                                            <td><span class="badge
                                                 {% if order.status == 'pending' %}bg-warning text-dark
                                                 {% elif order.status == 'processing' %}bg-info text-dark
                                                 {% elif order.status == 'shipped' %}bg-primary
@@ -225,6 +247,13 @@
                                                     {% endwith %}
                                                     <button type="submit" name="change_order_status" class="btn btn-sm btn-outline-info">ОК</button>
                                                 </form>
+                                            </td>
+                                            <td> {# Ячейка для ссылки на договор #}
+                                                {% if order.id %}
+                                                <a href="{% url 'view_agreement' order.id %}" class="btn btn-sm btn-outline-secondary" title="Посмотреть детали заказа/договор">
+                                                    <i class="bi bi-file-earmark-text"></i>
+                                                </a>
+                                                {% endif %}
                                             </td>
                                         </tr>
                                         {% endfor %}

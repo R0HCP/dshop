@@ -28,6 +28,7 @@ from .forms import UserProfileEditForm, AdminOrderStatusForm
 from django.db.models import Q # Для сложных запросов
 from django.core.paginator import Paginator # Для пагинации (если заказов много)
 
+
 try:
     pdfmetrics.registerFont(TTFont('IBMPlexSerif-Regular', 'static/fonts/IBMPlexSerif-Regular.ttf'))
 except Exception as e:
@@ -56,7 +57,18 @@ def price_list_view(request):
     return render(request, 'main/price_list.html', context)
 
 
+@login_required
+def view_agreement_details(request, order_id):
+    order = get_object_or_404(Order.objects.select_related('user', 'service', 'service__user'), pk=order_id)
 
+    # Проверка, что текущий пользователь является покупателем или продавцом в этом заказе (или админом)
+    if not (request.user == order.user or request.user == order.service.user or request.user.is_staff or request.user.is_superuser):
+        return HttpResponseForbidden("У вас нет доступа к этому документу.")
+
+    context = {
+        'order': order,
+    }
+    return render(request, 'main/agreement_details.html', context)
 
 
 @staff_member_required

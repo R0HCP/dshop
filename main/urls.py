@@ -28,5 +28,6 @@ urlpatterns = [
     path('booking/<int:booking_id>/client_profile/', views.client_profile_view, name='client_profile'), # Страница профиля клиента
     path('profile/download_report/', views.download_purchase_report_pdf, name='download_purchase_report'),
     path('profile/sales_report/', views.admin_sales_report_view, name='admin_sales_report'),
+    path('order/<int:order_id>/agreement/', views.view_agreement_details, name='view_agreement'),
     path('price-list/', views.price_list_view, name='price_list'), # URL для прейскуранта
 ]

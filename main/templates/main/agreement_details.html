@@ -1,0 +1,93 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Подтверждение заказа №{{ order.id }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h2 class="mb-0">Подтверждение заказа №{{ order.id }}</h2>
+        </div>
+        <div class="card-body">
+            <p class="lead">Дата оформления: {{ order.created_at|date:"d.m.Y H:i" }}</p>
+            <hr>
+
+            <h4 class="mt-4">Детали заказа:</h4>
+            <div class="table-responsive mb-4">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Услуга</th>
+                            <th>Количество</th>
+                            <th>Цена за ед.</th>
+                            <th>Итого</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{{ order.service.title }}</td>
+                            <td>{{ order.quantity }}</td>
+                            <td>{{ order.service.price }} ₽</td>
+                            <td>{{ order.total_price }} ₽</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            {% if order.estimated_completion_date %}
+            <p><strong>Ориентировочная дата выполнения:</strong> {{ order.estimated_completion_date|date:"d.m.Y" }}</p>
+            {% endif %}
+            <p><strong>Статус заказа:</strong> <span class="badge bg-info text-dark">{{ order.get_status_display }}</span></p>
+            <hr>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <h4 class="mt-4">Информация о покупателе:</h4>
+                    <p><strong>Имя пользователя:</strong> {{ order.user.username }}</p>
+                    {% if order.user.first_name or order.user.last_name %}
+                        <p><strong>Имя:</strong> {{ order.user.first_name }} {{ order.user.last_name }}</p>
+                    {% endif %}
+                    {% if order.user.email %}
+                        <p><strong>Email:</strong> {{ order.user.email }}</p>
+                    {% endif %}
+                    {% if order.user.phone %}
+                        <p><strong>Телефон:</strong> {{ order.user.phone }}</p>
+                    {% endif %}
+                </div>
+                <div class="col-md-6">
+                    <h4 class="mt-4">Информация о продавце:</h4>
+                    <p><strong>Имя пользователя:</strong> {{ order.service.user.username }}</p>
+                    {% if order.service.user.first_name or order.service.user.last_name %}
+                        <p><strong>Имя:</strong> {{ order.service.user.first_name }} {{ order.service.user.last_name }}</p>
+                    {% endif %}
+                    {% if order.service.user.email %}
+                        <p><strong>Email:</strong> {{ order.service.user.email }}</p>
+                    {% endif %}
+                    {% if order.service.user.phone %}
+                        <p><strong>Телефон:</strong> {{ order.service.user.phone }}</p>
+                    {% endif %}
+                    {% if order.service.user.office_latitude and order.service.user.office_longitude %}
+                        <p><strong>Офис продавца:</strong> <a href="https://yandex.ru/maps/?pt={{order.service.user.office_longitude}},{{order.service.user.office_latitude}}&z=15&l=map" target="_blank">Посмотреть на карте</a></p>
+                    {% endif %}
+                </div>
+            </div>
+            <hr>
+
+            <h4 class="mt-4">Условия предоставления услуги:</h4>
+            <p class="text-muted">
+                <em>(Здесь может быть стандартный текст условий вашего сервиса.
+                Например: "Продавец обязуется предоставить услугу '{{ order.service.title }}' в количестве {{ order.quantity }} шт.
+                в срок до {{ order.estimated_completion_date|date:"d.m.Y" }}. Покупатель обязуется оплатить стоимость услуги в размере {{ order.total_price }} ₽.
+                Все споры решаются в соответствии с законодательством РФ.")</em>
+            </p>
+            <p class="text-muted">
+                <em>Для получения более подробной информации или в случае возникновения вопросов, пожалуйста, свяжитесь с продавцом.</em>
+            </p>
+
+            <div class="text-center mt-4">
+                <button onclick="window.print()" class="btn btn-secondary"><i class="bi bi-printer"></i> Распечатать</button>
+                <a href="{% url 'profile' %}" class="btn btn-outline-primary">Вернуться в профиль</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

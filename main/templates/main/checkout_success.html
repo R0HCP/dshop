@@ -20,6 +20,9 @@
                     <p class="card-text lead">Спасибо за ваш Заявка на сумму <strong class="text-primary">{{ total_price }} Br</strong>!</p> {# Используем lead и выделяем сумму #}
                     <p class="card-text">В ближайшее время с вами свяжется наш менеджер для уточнения деталей.</p>
                     <hr class="my-4"> {# Горизонтальная линия для разделения #}
+                    {% if order %} {# Если объект заказа передается в контекст этого шаблона #}
+    <p><a href="{% url 'view_agreement' order.id %}" class="btn btn-info mt-2">Посмотреть детали заказа / Договор</a></p>
+{% endif %}
                     <a href="/" class="btn btn-primary">Вернуться на главную страницу</a>
                 </div>
             </div>
